@@ -515,7 +515,7 @@ gn_args+=(
 %if 0%{?ninja_build:1}
 %{ninja_build} -C out/Release chrome chrome_sandbox chromedriver
 %else
-ninja -v %{_smp_mflags} -C out/Release chrome chrome_sandbox chromedriver
+ninja -C out/Release chrome chrome_sandbox chromedriver
 %endif
 
 
