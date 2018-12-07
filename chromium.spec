@@ -512,11 +512,9 @@ gn_args+=(
 ./out/Release/gn gen out/Release \
     --script-executable=/usr/bin/python2 --args="${gn_args[*]}"
 
-%if 0%{?ninja_build:1}
-%{ninja_build} -C out/Release chrome chrome_sandbox chromedriver
-%else
+
 ninja -C out/Release chrome chrome_sandbox chromedriver
-%endif
+
 
 
 %install
