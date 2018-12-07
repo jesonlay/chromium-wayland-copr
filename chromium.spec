@@ -520,6 +520,7 @@ ninja -v %{_smp_mflags} -C out/Release chrome chrome_sandbox chromedriver
 
 
 %install
+ls out/Release/
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{chromiumdir}/locales
 mkdir -p %{buildroot}%{chromiumdir}/swiftshader
