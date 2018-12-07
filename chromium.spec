@@ -439,18 +439,18 @@ export AR=ar NM=nm
 export PNACLPYTHON=%{__python2}
 
 # Fedora 25 doesn't have __global_cxxflags
-#%if %{with fedora_compilation_flags}
-#export CFLAGS="$(echo '%{__global_cflags}' | sed 's/-fexceptions//')"
-#export CXXFLAGS="$(echo '%{?__global_cxxflags}%{!?__global_cxxflags:%{__global_cflags}}' | sed 's/-fexceptions//')"
-#export LDFLAGS='%{__global_ldflags}'
-#%endif
+%if %{with fedora_compilation_flags}
+export CFLAGS="$(echo '%{__global_cflags}' | sed 's/-fexceptions//')"
+export CXXFLAGS="$(echo '%{?__global_cxxflags}%{!?__global_cxxflags:%{__global_cflags}}' | sed 's/-fexceptions//')"
+export LDFLAGS='%{__global_ldflags}'
+%endif
 
-#%if %{with clang}
-#export CC=clang CXX=clang++
-#%else
-#export CC=gcc CXX=g++
-#export CXXFLAGS="$CXXFLAGS -fno-delete-null-pointer-checks -fpermissive"
-#%endif
+%if %{with clang}
+export CC=clang CXX=clang++
+%else
+export CC=gcc CXX=g++
+export CXXFLAGS="$CXXFLAGS -fno-delete-null-pointer-checks -fpermissive"
+%endif
 
 gn_args=(
     is_debug=false
