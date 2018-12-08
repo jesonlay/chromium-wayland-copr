@@ -462,7 +462,6 @@ gn_args=(
     use_xkbcommon=true
     use_system_minigbm=true
     use_cups=true
-    symbol_level=0
     remove_webcore_debug_symbols=true
     use_jumbo_build=true
     use_gnome_keyring=true
@@ -502,7 +501,7 @@ gn_args+=(
 
 gn_args+=(
 %if %{with symbol}
-    symbol_level=0
+    symbol_level=1
 %else
     symbol_level=0
 %endif
@@ -513,7 +512,7 @@ gn_args+=(
     --script-executable=/usr/bin/python2 --args="${gn_args[*]}"
 
 
-ninja -C out/Release chrome chrome_sandbox chromedriver
+ninja -j2 -C out/Release chrome chrome_sandbox chromedriver
 
 
 
