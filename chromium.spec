@@ -44,7 +44,7 @@
 %bcond_with fedora_compilation_flags
 
 Name:       chromium
-Version:    70.0.3538.110
+Version:    72.0.3622.0
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
@@ -565,7 +565,6 @@ for i in 22 24 32 48 64 128 256; do
     install -m 644 chrome/app/theme/chromium/${dir}product_logo_$i.${ext} \
         %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-browser.${ext}
 done
-
 
 %post
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
