@@ -98,9 +98,16 @@ Patch72:    chromium-gcc8-r589614.patch
 
 # Add patches from upstream to fix GN bootstrap
 Patch80:    chromium-gn-r607596.patch
-Patch81:    chromium-gbm-wrapper.patch
-Patch82:    chromium-screen-ozone.patch 
 # I don't have time to test whether it work on other architectures
+Patch90     chromium-1.patch
+Patch91     chromium-2.patch
+Patch92     chromium-3.patch
+Patch93     chromium-4.patch
+Patch94     chromium-5.patch
+Patch95     chromium-6.patch
+Patch96     chromium-7.patch
+Patch97     chromium-8.patch
+Patch98     chromium-9.patch
 ExclusiveArch: x86_64
 
 # Chromium 54 requires clang to enable nacl support
