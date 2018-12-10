@@ -81,26 +81,26 @@ Source12:   chromium-browser.xml
 Source13:   chromium-browser.appdata.xml
 
 # Disable non-free unrar
-Patch20:    chromium-disable-unrar.patch
+# Patch20:    chromium-disable-unrar.patch
 
 # Fix llvm-ar command usage
-Patch50:    chromium-nacl-llvm-ar.patch
+# Patch50:    chromium-nacl-llvm-ar.patch
 
 # Don't use unversioned python commands. This patch is based on
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
-Patch60:    chromium-bootstrap-python2.patch
+# Patch60:    chromium-bootstrap-python2.patch
 
 # Add patches from upstream to fix build with GCC
-Patch70:    chromium-gcc8-r588316.patch
-Patch71:    chromium-gcc8-r588547.patch
-Patch72:    chromium-gcc8-r589614.patch
+# Patch70:    chromium-gcc8-r588316.patch
+# Patch71:    chromium-gcc8-r588547.patch
+# Patch72:    chromium-gcc8-r589614.patch
 
 # Add patches from upstream to fix GN bootstrap
-Patch80:    chromium-gn-r607596.patch
+# Patch80:    chromium-gn-r607596.patch
 # I don't have time to test whether it work on other architectures
 Patch81:     chromium-1.patch
-Patch82:    chromium-2.patch
+Patch82:     chromium-2.patch
 Patch83:     chromium-3.patch
 Patch84:     chromium-4.patch
 Patch85:     chromium-5.patch
