@@ -280,7 +280,6 @@ find -type f -exec \
     third_party/flatbuffers \
     third_party/flot \
     third_party/freetype \
-    third_party/glslang-angle \
     third_party/google_input_tools \
     third_party/google_input_tools/third_party/closure_library \
     third_party/google_input_tools/third_party/closure_library/third_party/closure \
@@ -359,7 +358,6 @@ find -type f -exec \
     third_party/smhasher \
     third_party/speech-dispatcher \
     third_party/spirv-headers \
-    third_party/spirv-tools-angle \
     third_party/sqlite \
     third_party/swiftshader \
     third_party/swiftshader/third_party/llvm-subzero \
@@ -368,7 +366,6 @@ find -type f -exec \
     third_party/usb_ids \
     third_party/usrsctp \
     third_party/vulkan \
-    third_party/vulkan-validation-layers \
     third_party/wayland \
     third_party/wayland-protocols \
     third_party/web-animations-js \
