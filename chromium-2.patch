@@ -114,7 +114,7 @@ diff --git a/ui/ozone/platform/wayland/ozone_platform_wayland.cc b/ui/ozone/plat
 index 642a276b0c12b..577db286c9075 100644
 --- a/ui/ozone/platform/wayland/ozone_platform_wayland.cc
 +++ b/ui/ozone/platform/wayland/ozone_platform_wayland.cc
-@@ -110,7 +110,8 @@ class OzonePlatformWayland : public OzonePlatform {
+@@ -114,7 +114,8 @@ class OzonePlatformWayland : public OzonePlatform {
      // The WaylandConnection and the WaylandOutputManager must be created before
      // PlatformScreen.
      DCHECK(connection_ && connection_->wayland_output_manager());
@@ -123,7 +123,7 @@ index 642a276b0c12b..577db286c9075 100644
 +        connection_.get());
    }
  
-   void InitializeUI(const InitParams& args) override {
+   bool IsNativePixmapConfigSupported(gfx::BufferFormat format,
 diff --git a/ui/ozone/platform/wayland/wayland_output.cc b/ui/ozone/platform/wayland/wayland_output.cc
 index fd14f45d63324..0ab6ebaccfbd1 100644
 --- a/ui/ozone/platform/wayland/wayland_output.cc

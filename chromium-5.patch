@@ -47,7 +47,7 @@ diff --git a/ui/ozone/platform/wayland/wayland_window.cc b/ui/ozone/platform/way
 index d2349a910ae36..41a178fd0ce6e 100644
 --- a/ui/ozone/platform/wayland/wayland_window.cc
 +++ b/ui/ozone/platform/wayland/wayland_window.cc
-@@ -449,6 +449,12 @@ gfx::Rect WaylandWindow::GetRestoredBoundsInPixels() const {
+@@ -440,6 +440,12 @@ gfx::Rect WaylandWindow::GetRestoredBoundsInPixels() const {
    return restored_bounds_;
  }
  
@@ -64,7 +64,7 @@ diff --git a/ui/ozone/platform/wayland/wayland_window.h b/ui/ozone/platform/wayl
 index 8bbfbc503d169..ddec611f00a90 100644
 --- a/ui/ozone/platform/wayland/wayland_window.h
 +++ b/ui/ozone/platform/wayland/wayland_window.h
-@@ -120,6 +120,8 @@ class WaylandWindow : public PlatformWindow,
+@@ -112,6 +112,8 @@ class WaylandWindow : public PlatformWindow,
    PlatformImeController* GetPlatformImeController() override;
    void SetRestoredBoundsInPixels(const gfx::Rect& bounds) override;
    gfx::Rect GetRestoredBoundsInPixels() const override;
@@ -699,7 +699,7 @@ diff --git a/ui/platform_window/x11/x11_window_base.cc b/ui/platform_window/x11/
 index 51f5e8e17c380..1887b3b377a8a 100644
 --- a/ui/platform_window/x11/x11_window_base.cc
 +++ b/ui/platform_window/x11/x11_window_base.cc
-@@ -203,7 +203,7 @@ void X11WindowBase::SetBounds(const gfx::Rect& bounds) {
+@@ -170,7 +170,7 @@ void X11WindowBase::SetBounds(const gfx::Rect& bounds) {
      XWindowChanges changes = {0};
      unsigned value_mask = 0;
  
@@ -708,7 +708,7 @@ index 51f5e8e17c380..1887b3b377a8a 100644
        changes.width = bounds.width();
        changes.height = bounds.height();
        value_mask |= CWHeight | CWWidth;
-@@ -223,8 +223,13 @@ void X11WindowBase::SetBounds(const gfx::Rect& bounds) {
+@@ -190,8 +190,13 @@ void X11WindowBase::SetBounds(const gfx::Rect& bounds) {
    // case if we're running without a window manager.  If there's a window
    // manager, it can modify or ignore the request, but (per ICCCM) we'll get a
    // (possibly synthetic) ConfigureNotify about the actual size and correct
@@ -723,7 +723,7 @@ index 51f5e8e17c380..1887b3b377a8a 100644
  
    // Even if the pixel bounds didn't change this call to the delegate should
    // still happen. The device scale factor may have changed which effectively
-@@ -343,6 +348,12 @@ gfx::Rect X11WindowBase::GetRestoredBoundsInPixels() const {
+@@ -310,6 +315,12 @@ gfx::Rect X11WindowBase::GetRestoredBoundsInPixels() const {
    return gfx::Rect();
  }
  

@@ -105,9 +105,9 @@ Patch83:     chromium-3.patch
 Patch84:     chromium-4.patch
 Patch85:     chromium-5.patch
 Patch86:     chromium-6.patch
-Patch87:     chromium-7.patch
-Patch88:     chromium-8.patch
-Patch89:     chromium-9.patch
+#Patch87:     chromium-7.patch
+#Patch88:     chromium-8.patch
+#Patch89:     chromium-9.patch
 ExclusiveArch: x86_64
 
 # Chromium 54 requires clang to enable nacl support
