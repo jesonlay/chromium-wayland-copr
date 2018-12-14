@@ -44,7 +44,7 @@
 %bcond_with fedora_compilation_flags
 
 Name:       chromium
-Version:    72.0.3626.14
+Version:    72.0.3626.7
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
