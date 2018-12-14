@@ -245,14 +245,6 @@ sed -i 's|//third_party/usb_ids|/usr/share/hwdata|g' device/usb/BUILD.gn
 # Don't use static libstdc++
 sed -i '/-static-libstdc++/d' tools/gn/build/gen.py
 
-rmdir third_party/markupsafe
-ln -s %{python2_sitearch}/markupsafe third_party/markupsafe
-
-%if %{with system_ply}
-rmdir third_party/ply
-ln -s %{python2_sitelib}/ply third_party/ply
-%endif
-
 mkdir -p third_party/node/linux/node-linux-x64/bin
 ln -s %{_bindir}/node third_party/node/linux/node-linux-x64/bin/node
 
