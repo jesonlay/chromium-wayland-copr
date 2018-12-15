@@ -278,7 +278,6 @@ gn_args=(
     use_system_minigbm=true
     use_cups=true
     remove_webcore_debug_symbols=true
-    use_jumbo_build=true
     use_gnome_keyring=true
     use_gio=true
     use_kerberos=true
