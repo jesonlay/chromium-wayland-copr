@@ -44,7 +44,7 @@
 %bcond_with fedora_compilation_flags
 
 Name:       chromium
-Version:    72.0.3626.7
+Version:    74.0.3718.0
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
@@ -99,15 +99,46 @@ Patch60:    chromium-bootstrap-python2.patch
 # Add patches from upstream to fix GN bootstrap
 # Patch80:    chromium-gn-r607596.patch
 # I don't have time to test whether it work on other architectures
-Patch81:     chromium-1.patch
-Patch82:     chromium-2.patch
-Patch83:     chromium-3.patch
-Patch84:     chromium-4.patch
-Patch85:     chromium-5.patch
-Patch86:     chromium-6.patch
-#Patch87:     chromium-7.patch
-#Patch88:     chromium-8.patch
-#Patch89:     chromium-9.patch
+Patch81:     1.patch
+Patch82:     2.patch
+Patch83:     3.patch
+Patch84:     4.patch
+Patch85:     5.patch
+Patch86:     6.patch
+Patch87:     7.patch
+Patch88:     8.patch
+Patch89:     9.patch
+Patch90:     10.patch
+Patch91:     11.patch
+Patch92:     12.patch
+Patch93:     13.patch
+Patch94:     14.patch
+Patch95:     15.patch
+Patch96:     16.patch
+Patch97:     17.patch
+Patch98:     18.patch
+Patch99:     19.patch
+Patch100:     20.patch
+Patch101:     21.patch
+Patch102:     22.patch
+Patch103:     23.patch
+Patch104:     24.patch
+Patch105:     25.patch
+Patch106:     26.patch
+Patch107:     27.patch
+Patch108:     28.patch
+Patch109:     29.patch
+Patch110:     30.patch
+Patch111:     31.patch
+Patch112:     32.patch
+Patch113:     33.patch
+Patch114:     34.patch
+Patch115:     35.patch
+Patch116:     36.patch
+Patch117:     37.patch
+Patch118:     38.patch
+
+
 ExclusiveArch: x86_64
 
 # Chromium 54 requires clang to enable nacl support
