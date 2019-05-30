@@ -1,0 +1,180 @@
+From 4d79b42915c5b6cc35ecad2bac77bb20e12c2a31 Mon Sep 17 00:00:00 2001
+From: Yoichi Osato <yoichio@chromium.org>
+Date: Mon, 25 Feb 2019 07:56:42 +0000
+Subject: [PATCH] Early return if LayoutObject is not associated with
+ PaintLayer.
+
+This patch fixes a ChromeOS crash that paint_layer.cc:MapPointInPaintInvalidationContainerToBacking
+needs LayoutObject with PaintLayer but ComputeLayerSelection doesn't check it.
+This patch fixes the issue by early returning.
+This patch also moving the DCHECK earlier and getting GraphicsLayer reference more earlier for codehealth.
+45ea6198b1a6586aa34a16577f203a75781&l=20
+
+Bug: 933508
+TEST: blink_unittests --gtest_filter=*ComputeLayerSelection*
+
+Change-Id: I05224522d5dd28f857b2392139794f147d7470bd
+Reviewed-on: https://chromium-review.googlesource.com/c/1484393
+Reviewed-by: Yoshifumi Inoue <yosin@chromium.org>
+Reviewed-by: Kent Tamura <tkent@chromium.org>
+Commit-Queue: Yoichi Osato <yoichio@chromium.org>
+Cr-Commit-Position: refs/heads/master@{#635047}
+---
+ .../core/editing/compute_layer_selection.cc   | 74 +++++++++----------
+ .../presubmit/audit_non_blink_usage.py        |  1 +
+ 2 files changed, 35 insertions(+), 40 deletions(-)
+
+diff --git a/third_party/blink/renderer/core/editing/compute_layer_selection.cc b/third_party/blink/renderer/core/editing/compute_layer_selection.cc
+index db0e8e77d8c35..0688e10e21220 100644
+--- a/third_party/blink/renderer/core/editing/compute_layer_selection.cc
++++ b/third_party/blink/renderer/core/editing/compute_layer_selection.cc
+@@ -49,27 +49,14 @@
+ 
+ namespace blink {
+ 
+-// Note: If the layout object has a scrolling contents layer, the selection
+-// will be relative to that.
+-static GraphicsLayer* GetGraphicsLayerBacking(
+-    const LayoutObject& layout_object) {
+-  const LayoutBoxModelObject& paint_invalidation_container =
+-      layout_object.ContainerForPaintInvalidation();
+-  DCHECK(paint_invalidation_container.Layer());
+-  if (paint_invalidation_container.Layer()->GetCompositingState() ==
+-      kNotComposited)
+-    return nullptr;
+-  return paint_invalidation_container.Layer()->GraphicsLayerBacking(
+-      &layout_object);
+-}
+-
+ // Convert a local point into the coordinate system of backing coordinates.
+ static gfx::Point LocalToInvalidationBackingPoint(
+     const LayoutPoint& local_point,
+-    const LayoutObject& layout_object) {
++    const LayoutObject& layout_object,
++    const GraphicsLayer& graphics_layer) {
+   const LayoutBoxModelObject& paint_invalidation_container =
+       layout_object.ContainerForPaintInvalidation();
+-  DCHECK(paint_invalidation_container.Layer());
++  const PaintLayer& paint_layer = *paint_invalidation_container.Layer();
+ 
+   FloatPoint container_point = layout_object.LocalToAncestorPoint(
+       FloatPoint(local_point), &paint_invalidation_container,
+@@ -77,15 +64,12 @@ static gfx::Point LocalToInvalidationBackingPoint(
+ 
+   // A layoutObject can have no invalidation backing if it is from a detached
+   // frame, or when forced compositing is disabled.
+-  if (paint_invalidation_container.Layer()->GetCompositingState() ==
+-      kNotComposited)
++  if (paint_layer.GetCompositingState() == kNotComposited)
+     return RoundedIntPoint(container_point);
+ 
+   PaintLayer::MapPointInPaintInvalidationContainerToBacking(
+       paint_invalidation_container, container_point);
+-
+-  if (GraphicsLayer* graphics_layer = GetGraphicsLayerBacking(layout_object))
+-    container_point.Move(-graphics_layer->OffsetFromLayoutObject());
++  container_point.Move(-graphics_layer.OffsetFromLayoutObject());
+ 
+   // Ensure the coordinates are in the scrolling contents space, if the object
+   // is a scroller.
+@@ -161,20 +145,18 @@ static bool IsVisible(const LayoutObject& rect_layout_object,
+   return text_control_object->BorderBoxRect().Contains(position_in_input);
+ }
+ 
+-static base::Optional<cc::LayerSelectionBound> ComputeSelectionBound(
++static cc::LayerSelectionBound ComputeSelectionBound(
+     const LayoutObject& layout_object,
++    const GraphicsLayer& graphics_layer,
+     const LayoutPoint& edge_top_in_layer,
+     const LayoutPoint& edge_bottom_in_layer) {
+   cc::LayerSelectionBound bound;
+ 
+-  bound.edge_top =
+-      LocalToInvalidationBackingPoint(edge_top_in_layer, layout_object);
+-  bound.edge_bottom =
+-      LocalToInvalidationBackingPoint(edge_bottom_in_layer, layout_object);
+-  GraphicsLayer* const layer = GetGraphicsLayerBacking(layout_object);
+-  if (!layer)
+-    return base::nullopt;
+-  bound.layer_id = layer->CcLayer()->id();
++  bound.edge_top = LocalToInvalidationBackingPoint(
++      edge_top_in_layer, layout_object, graphics_layer);
++  bound.edge_bottom = LocalToInvalidationBackingPoint(
++      edge_bottom_in_layer, layout_object, graphics_layer);
++  bound.layer_id = graphics_layer.CcLayer()->id();
+   bound.hidden =
+       !IsVisible(layout_object, edge_top_in_layer, edge_bottom_in_layer);
+   return bound;
+@@ -190,6 +172,18 @@ static inline bool IsTextDirectionRTL(const Node& node,
+          PrimaryDirectionOf(node) == TextDirection::kRtl;
+ }
+ 
++static GraphicsLayer* GetGraphicsLayerFor(const LayoutObject& layout_object) {
++  const LayoutBoxModelObject& paint_invalidation_container =
++      layout_object.ContainerForPaintInvalidation();
++  DCHECK(paint_invalidation_container.Layer()) << layout_object;
++  if (!paint_invalidation_container.Layer())
++    return nullptr;
++  const PaintLayer& paint_layer = *paint_invalidation_container.Layer();
++  if (paint_layer.GetCompositingState() == kNotComposited)
++    return nullptr;
++  return paint_layer.GraphicsLayerBacking(&layout_object);
++}
++
+ static base::Optional<cc::LayerSelectionBound>
+ StartPositionInGraphicsLayerBacking(const SelectionInDOMTree& selection) {
+   const PositionWithAffinity position(selection.ComputeStartPosition(),
+@@ -198,15 +192,15 @@ StartPositionInGraphicsLayerBacking(const SelectionInDOMTree& selection) {
+   const LayoutObject* const layout_object = local_caret_rect.layout_object;
+   if (!layout_object)
+     return base::nullopt;
++  GraphicsLayer* graphics_layer = GetGraphicsLayerFor(*layout_object);
++  if (!graphics_layer)
++    return base::nullopt;
+ 
+   LayoutPoint edge_top_in_layer, edge_bottom_in_layer;
+   std::tie(edge_top_in_layer, edge_bottom_in_layer) =
+       GetLocalSelectionStartpoints(local_caret_rect);
+-  const auto& maybe = ComputeSelectionBound(*layout_object, edge_top_in_layer,
+-                                            edge_bottom_in_layer);
+-  if (!maybe.has_value())
+-    return base::nullopt;
+-  cc::LayerSelectionBound bound = maybe.value();
++  cc::LayerSelectionBound bound = ComputeSelectionBound(
++      *layout_object, *graphics_layer, edge_top_in_layer, edge_bottom_in_layer);
+   if (selection.IsRange()) {
+     bound.type = IsTextDirectionRTL(*position.AnchorNode(), *layout_object)
+                      ? gfx::SelectionBound::Type::RIGHT
+@@ -225,15 +219,15 @@ EndPositionInGraphicsLayerBacking(const SelectionInDOMTree& selection) {
+   const LayoutObject* const layout_object = local_caret_rect.layout_object;
+   if (!layout_object)
+     return base::nullopt;
++  GraphicsLayer* graphics_layer = GetGraphicsLayerFor(*layout_object);
++  if (!graphics_layer)
++    return base::nullopt;
+ 
+   LayoutPoint edge_top_in_layer, edge_bottom_in_layer;
+   std::tie(edge_top_in_layer, edge_bottom_in_layer) =
+       GetLocalSelectionEndpoints(local_caret_rect);
+-  const auto& maybe = ComputeSelectionBound(*layout_object, edge_top_in_layer,
+-                                            edge_bottom_in_layer);
+-  if (!maybe.has_value())
+-    return base::nullopt;
+-  cc::LayerSelectionBound bound = maybe.value();
++  cc::LayerSelectionBound bound = ComputeSelectionBound(
++      *layout_object, *graphics_layer, edge_top_in_layer, edge_bottom_in_layer);
+   if (selection.IsRange()) {
+     bound.type = IsTextDirectionRTL(*position.AnchorNode(), *layout_object)
+                      ? gfx::SelectionBound::Type::LEFT
+diff --git a/third_party/blink/tools/blinkpy/presubmit/audit_non_blink_usage.py b/third_party/blink/tools/blinkpy/presubmit/audit_non_blink_usage.py
+index fea8ba94cdfab..104c721f0de5c 100755
+--- a/third_party/blink/tools/blinkpy/presubmit/audit_non_blink_usage.py
++++ b/third_party/blink/tools/blinkpy/presubmit/audit_non_blink_usage.py
+@@ -203,6 +203,7 @@
+ 
+             # Selection bounds.
+             'cc::LayerSelection',
++            'cc::LayerSelectionBound',
+             'gfx::SelectionBound',
+ 
+             # cc::Layers.

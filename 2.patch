@@ -1,0 +1,38 @@
+From 12e34b0775a6581f2993a0ec994b17bd5e6f44a4 Mon Sep 17 00:00:00 2001
+From: Gyuyoung Kim <gyuyoung@igalia.com>
+Date: Mon, 25 Feb 2019 04:11:50 +0000
+Subject: [PATCH] BlinkMemoryMgt: Annotate BluetoothRemoveGATTUtils with
+ STATIC_ONLY
+
+BluetoothRemoveGATTUtils class only has a static function. So it makes
+sense to annonate STATIC_ONLY.
+
+Bug: 919389
+Change-Id: Iba53b362bda84b7fb3f34def551ed63f61a45ccd
+Reviewed-on: https://chromium-review.googlesource.com/c/1484882
+Reviewed-by: Kentaro Hara <haraken@chromium.org>
+Commit-Queue: Gyuyoung Kim <gyuyoung@igalia.com>
+Cr-Commit-Position: refs/heads/master@{#635027}
+---
+ .../renderer/modules/bluetooth/bluetooth_remote_gatt_utils.h   | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/third_party/blink/renderer/modules/bluetooth/bluetooth_remote_gatt_utils.h b/third_party/blink/renderer/modules/bluetooth/bluetooth_remote_gatt_utils.h
+index 42175f4a6b1d9..4523196d3b17d 100644
+--- a/third_party/blink/renderer/modules/bluetooth/bluetooth_remote_gatt_utils.h
++++ b/third_party/blink/renderer/modules/bluetooth/bluetooth_remote_gatt_utils.h
+@@ -6,11 +6,14 @@
+ #define THIRD_PARTY_BLINK_RENDERER_MODULES_BLUETOOTH_BLUETOOTH_REMOTE_GATT_UTILS_H_
+ 
+ #include "third_party/blink/renderer/core/typed_arrays/dom_data_view.h"
++#include "third_party/blink/renderer/platform/wtf/allocator.h"
+ #include "third_party/blink/renderer/platform/wtf/vector.h"
+ 
+ namespace blink {
+ 
+ class BluetoothRemoteGATTUtils final {
++  STATIC_ONLY(BluetoothRemoteGATTUtils);
++
+  public:
+   static DOMDataView* ConvertWTFVectorToDataView(const WTF::Vector<uint8_t>&);
+ };

@@ -1,0 +1,146 @@
+From 0d25dff0cd8a71c816f6c9a706f9de54b1008bcc Mon Sep 17 00:00:00 2001
+From: Kuo Jen Wei <inker@google.com>
+Date: Mon, 25 Feb 2019 06:12:02 +0000
+Subject: [PATCH] Replace setTimeout in camera view to sound delay promise.
+
+BUG=None
+TEST=Test the sound delay in record mode and can cancel delay
+successfully.
+
+Change-Id: Idfc77c4acb838c9d161e7551dd4559c4e5e5e7dd
+Reviewed-on: https://chromium-review.googlesource.com/c/1477467
+Reviewed-by: Sheng-hao Tsao <shenghao@google.com>
+Commit-Queue: Kuo Jen Wei <inker@chromium.org>
+Auto-Submit: Kuo Jen Wei <inker@chromium.org>
+Cr-Commit-Position: refs/heads/master@{#635034}
+---
+ .../resources/chromeos/camera/src/js/sound.js | 22 +++++++--
+ .../chromeos/camera/src/js/views/camera.js    | 46 +++++++++----------
+ .../chromeos/camera/src/views/main.html       |  8 ++--
+ 3 files changed, 44 insertions(+), 32 deletions(-)
+
+diff --git a/chrome/browser/resources/chromeos/camera/src/js/sound.js b/chrome/browser/resources/chromeos/camera/src/js/sound.js
+index a1cf01d2cdc31..21f7084f9fbc6 100644
+--- a/chrome/browser/resources/chromeos/camera/src/js/sound.js
++++ b/chrome/browser/resources/chromeos/camera/src/js/sound.js
+@@ -17,12 +17,24 @@ cca.sound = cca.sound || {};
+ /**
+  * Plays a sound.
+  * @param {string} selector Selector of the sound.
+- * @return {boolean} Whether the sound should be played.
++ * @return {Promise} Promise for waiting finishing playing or canceling wait.
+  */
+ cca.sound.play = function(selector) {
++  // Use a timeout to wait for sound finishing playing instead of end-event
++  // as it might not be played at all (crbug.com/135780).
+   // TODO(yuli): Don't play sounds if the speaker settings is muted.
+-  var element = document.querySelector(selector);
+-  element.currentTime = 0;
+-  element.play();
+-  return true;
++  var cancel;
++  var p = new Promise((resolve, reject) => {
++    var element = document.querySelector(selector);
++    var timeout =
++        setTimeout(resolve, parseInt(element.dataset.timeout || 0), 10);
++    cancel = () => {
++      clearTimeout(timeout);
++      reject();
++    };
++    element.currentTime = 0;
++    element.play();
++  });
++  p.cancel = cancel;
++  return p;
+ };
+diff --git a/chrome/browser/resources/chromeos/camera/src/js/views/camera.js b/chrome/browser/resources/chromeos/camera/src/js/views/camera.js
+index 6f1ad5c45bb90..19b2104083b06 100644
+--- a/chrome/browser/resources/chromeos/camera/src/js/views/camera.js
++++ b/chrome/browser/resources/chromeos/camera/src/js/views/camera.js
+@@ -105,11 +105,11 @@ cca.views.Camera = function(model) {
+   this.started_ = null;
+ 
+   /**
+-   * Timeout for a take of photo or recording.
+-   * @type {?number}
++   * Promise for play sound delay.
++   * @type {?Promise}
+    * @private
+    */
+-  this.takeTimeout_ = null;
++  this.deferred_capture_ = null;
+ 
+   /**
+    * Promise for the current take of photo or recording.
+@@ -231,23 +231,24 @@ cca.views.Camera.prototype.beginTake_ = function() {
+   cca.views.camera.timertick.start().then(() => {
+     // Play a sound before starting to record and delay the take to avoid the
+     // sound being recorded if necessary.
+-    var delay =
+-        (this.recordMode && cca.sound.play('#sound-rec-start')) ? 250 : 0;
+-    this.takeTimeout_ = setTimeout(() => {
+-      if (this.recordMode) {
+-        // Take of recording will be ended by another shutter click.
+-        this.take_ = this.createRecordingBlob_().catch((error) => {
+-          cca.toast.show('error_msg_empty_recording');
+-          throw error;
+-        });
+-      } else {
+-        this.take_ = this.createPhotoBlob_().catch((error) => {
+-          cca.toast.show('error_msg_take_photo_failed');
+-          throw error;
+-        });
+-        this.endTake_();
+-      }
+-    }, delay);
++    this.deferred_capture_ =
++        this.recordMode ? cca.sound.play('#sound-rec-start') : null;
++    return this.deferred_capture_ &&
++        this.deferred_capture_.finally(() => this.deferred_capture_ = null);
++  }).then(() => {
++    if (this.recordMode) {
++      // Take of recording will be ended by another shutter click.
++      this.take_ = this.createRecordingBlob_().catch((error) => {
++        cca.toast.show('error_msg_empty_recording');
++        throw error;
++      });
++    } else {
++      this.take_ = this.createPhotoBlob_().catch((error) => {
++        cca.toast.show('error_msg_take_photo_failed');
++        throw error;
++      });
++      this.endTake_();
++    }
+   }).catch(() => {});
+ };
+ 
+@@ -258,9 +259,8 @@ cca.views.Camera.prototype.beginTake_ = function() {
+  */
+ cca.views.Camera.prototype.endTake_ = function() {
+   cca.views.camera.timertick.cancel();
+-  if (this.takeTimeout_) {
+-    clearTimeout(this.takeTimeout_);
+-    this.takeTimeout_ = null;
++  if (this.deferred_capture_ && this.deferred_capture_.cancel) {
++    this.deferred_capture_.cancel();
+   }
+   if (this.mediaRecorder_ && this.mediaRecorder_.state == 'recording') {
+     this.mediaRecorder_.stop();
+diff --git a/chrome/browser/resources/chromeos/camera/src/views/main.html b/chrome/browser/resources/chromeos/camera/src/views/main.html
+index 30ce91580a512..5bc98164cec15 100644
+--- a/chrome/browser/resources/chromeos/camera/src/views/main.html
++++ b/chrome/browser/resources/chromeos/camera/src/views/main.html
+@@ -209,9 +209,9 @@
+     </div>
+     <div class="centered-overlay" id="toast" aria-live="polite"></div>
+     <div id="tooltip" aria-hidden="true"></div>
+-    <audio id="sound-tick" src="../sounds/tick.ogg">
+-    <audio id="sound-shutter" src="../sounds/shutter.ogg">
+-    <audio id="sound-rec-start" src="../sounds/record_start.ogg">
+-    <audio id="sound-rec-end" src="../sounds/record_end.ogg">
++    <audio id="sound-tick" src="../sounds/tick.ogg" data-timeout="200">
++    <audio id="sound-shutter" src="../sounds/shutter.ogg" data-timeout="350">
++    <audio id="sound-rec-start" src="../sounds/record_start.ogg" data-timeout="200">
++    <audio id="sound-rec-end" src="../sounds/record_end.ogg" data-timeout="450">
+   </body>
+ </html>

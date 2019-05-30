@@ -1,0 +1,868 @@
+From 0ed9ef9d7a46edc116b8e270efbc9529584b2f71 Mon Sep 17 00:00:00 2001
+From: Maksim Sisov <msisov@igalia.com>
+Date: Tue, 17 Oct 2017 15:13:32 +0300
+Subject: [PATCH] Add inital support for a tab drag window.
+
+This patch adds an initial support to start a move loop and create
+a new window by dragging a tab. To start with, this commit
+extends WindowTree::PerformWindowMove, which calls
+WindowServer::StartMoveLoop -> PlatformWindow::RunMoveLoop.
+
+X11 Ozone implementation of PlatformWindow uses
+WindowMoveLoopClient, which instantiates the move loop and
+WholeScreenMoveLoop, which creates an invisible window
+and intercepts all the events from it. Then the system screen
+location is taken and sent to WindowMoveLoopClient, which
+updates actual bounds of X11WindowBase.
+
+The way it works is precisly the same as in stock X11, but
+further work to share the code is needed, because there are
+some difference between stock x11 and ozone x11 event
+handlings, bounds set and etc.
+
+Issue #264
+
+fixup! [ozone/wayland] Add inital support for a tab drag window.
+
+adapt to
+https://crrev.com/c/774778
+
+CanDispatchEvent is modified in such a way that it also tests if
+the client in a move loop right now. If so, it must dispatch events
+further once whole_screen_move_loop processes them in order to update
+mouse locations on aura side.
+
+fixup! [ozone/wayland] Add inital support for a tab drag window.
+
+It removed changes at services from previous change to make it
+available without mus and made WindowFinder with ozone work without
+mus with creating GetLocalProcessWindowAtPointOzone to
+get gfx::NativeWindow at input position.
+
+Issue #430
+
+fixup! Add inital support for a tab drag window.
+
+Remove the non-existing code and fix ozone/drm build.
+
+Change-Id: I9d3a94a9e47ed2bddaef0253de193d92e01768b0
+---
+ .../ui/views/tabs/window_finder_ozone.cc      |   3 +
+ ui/ozone/platform/drm/host/drm_window_host.cc |   6 +
+ ui/ozone/platform/drm/host/drm_window_host.h  |   2 +
+ ui/ozone/platform/wayland/wayland_window.cc   |   6 +
+ ui/ozone/platform/wayland/wayland_window.h    |   2 +
+ ui/ozone/platform/x11/x11_window_ozone.cc     |  33 ++-
+ ui/ozone/platform/x11/x11_window_ozone.h      |   9 +
+ ui/platform_window/platform_window.h          |   5 +
+ ui/platform_window/stub/stub_window.cc        |   6 +
+ ui/platform_window/stub/stub_window.h         |   2 +
+ ui/platform_window/x11/BUILD.gn               |  13 +-
+ .../x11/whole_screen_move_loop.cc             | 228 ++++++++++++++++++
+ .../x11/whole_screen_move_loop.h              |  90 +++++++
+ .../x11/window_move_loop_client.cc            |  62 +++++
+ .../x11/window_move_loop_client.h             |  56 +++++
+ ui/platform_window/x11/x11_window_base.cc     |  15 +-
+ ui/platform_window/x11/x11_window_base.h      |   3 +
+ .../desktop_window_tree_host_platform.cc      |   7 +-
+ .../desktop_aura/x11_move_loop_delegate.h     |   2 +
+ 19 files changed, 541 insertions(+), 9 deletions(-)
+ create mode 100644 ui/platform_window/x11/whole_screen_move_loop.cc
+ create mode 100644 ui/platform_window/x11/whole_screen_move_loop.h
+ create mode 100644 ui/platform_window/x11/window_move_loop_client.cc
+ create mode 100644 ui/platform_window/x11/window_move_loop_client.h
+
+diff --git a/chrome/browser/ui/views/tabs/window_finder_ozone.cc b/chrome/browser/ui/views/tabs/window_finder_ozone.cc
+index f290223e703cf..72accb0e2cd3f 100644
+--- a/chrome/browser/ui/views/tabs/window_finder_ozone.cc
++++ b/chrome/browser/ui/views/tabs/window_finder_ozone.cc
+@@ -2,7 +2,10 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++#include "chrome/browser/ui/browser_list.h"
++#include "chrome/browser/ui/browser_window.h"
+ #include "chrome/browser/ui/views/tabs/window_finder.h"
++#include "ui/views/widget/widget.h"
+ 
+ #include "base/stl_util.h"
+ #include "ui/aura/window.h"
+diff --git a/ui/ozone/platform/drm/host/drm_window_host.cc b/ui/ozone/platform/drm/host/drm_window_host.cc
+index 0985ef4a86d90..d92e2098ee0a6 100644
+--- a/ui/ozone/platform/drm/host/drm_window_host.cc
++++ b/ui/ozone/platform/drm/host/drm_window_host.cc
+@@ -147,6 +147,12 @@ gfx::Rect DrmWindowHost::GetRestoredBoundsInPixels() const {
+   return gfx::Rect();
+ }
+ 
++bool DrmWindowHost::RunMoveLoop(const gfx::Vector2d& drag_offset) {
++  return false;
++}
++
++void DrmWindowHost::StopMoveLoop() {}
++
+ bool DrmWindowHost::CanDispatchEvent(const PlatformEvent& event) {
+   DCHECK(event);
+ 
+diff --git a/ui/ozone/platform/drm/host/drm_window_host.h b/ui/ozone/platform/drm/host/drm_window_host.h
+index c935c7b9f2af5..74f3d7c8f3ad9 100644
+--- a/ui/ozone/platform/drm/host/drm_window_host.h
++++ b/ui/ozone/platform/drm/host/drm_window_host.h
+@@ -79,6 +79,8 @@ class DrmWindowHost : public PlatformWindow,
+   PlatformImeController* GetPlatformImeController() override;
+   void SetRestoredBoundsInPixels(const gfx::Rect& bounds) override;
+   gfx::Rect GetRestoredBoundsInPixels() const override;
++  bool RunMoveLoop(const gfx::Vector2d& drag_offset) override;
++  void StopMoveLoop() override;
+ 
+   // PlatformEventDispatcher:
+   bool CanDispatchEvent(const PlatformEvent& event) override;
+diff --git a/ui/ozone/platform/wayland/wayland_window.cc b/ui/ozone/platform/wayland/wayland_window.cc
+index d400c61161e7d..8c3fe45f095e1 100644
+--- a/ui/ozone/platform/wayland/wayland_window.cc
++++ b/ui/ozone/platform/wayland/wayland_window.cc
+@@ -472,6 +472,12 @@ gfx::Rect WaylandWindow::GetRestoredBoundsInPixels() const {
+   return restored_bounds_;
+ }
+ 
++bool WaylandWindow::RunMoveLoop(const gfx::Vector2d& drag_offset) {
++  return true;
++}
++
++void WaylandWindow::StopMoveLoop() {}
++
+ bool WaylandWindow::CanDispatchEvent(const PlatformEvent& event) {
+   // This window is a nested popup window, all the events must be forwarded
+   // to the main popup window.
+diff --git a/ui/ozone/platform/wayland/wayland_window.h b/ui/ozone/platform/wayland/wayland_window.h
+index 1b6a5bd910f26..17a74f46e0f67 100644
+--- a/ui/ozone/platform/wayland/wayland_window.h
++++ b/ui/ozone/platform/wayland/wayland_window.h
+@@ -124,6 +124,8 @@ class WaylandWindow : public PlatformWindow,
+   PlatformImeController* GetPlatformImeController() override;
+   void SetRestoredBoundsInPixels(const gfx::Rect& bounds) override;
+   gfx::Rect GetRestoredBoundsInPixels() const override;
++  bool RunMoveLoop(const gfx::Vector2d& drag_offset) override;
++  void StopMoveLoop() override;
+ 
+   // PlatformEventDispatcher
+   bool CanDispatchEvent(const PlatformEvent& event) override;
+diff --git a/ui/ozone/platform/x11/x11_window_ozone.cc b/ui/ozone/platform/x11/x11_window_ozone.cc
+index c3f17315009ef..9c312abdad9d1 100644
+--- a/ui/ozone/platform/x11/x11_window_ozone.cc
++++ b/ui/ozone/platform/x11/x11_window_ozone.cc
+@@ -24,6 +24,11 @@ X11WindowOzone::X11WindowOzone(X11WindowManagerOzone* window_manager,
+   auto* event_source = X11EventSourceLibevent::GetInstance();
+   if (event_source)
+     event_source->AddXEventDispatcher(this);
++
++// TODO(msisov, tonikitoo): Add a dummy implementation for chromeos.
++#if !defined(OS_CHROMEOS)
++  move_loop_client_.reset(new WindowMoveLoopClient());
++#endif
+ }
+ 
+ X11WindowOzone::~X11WindowOzone() {
+@@ -49,6 +54,24 @@ void X11WindowOzone::SetCursor(PlatformCursor cursor) {
+   XDefineCursor(xdisplay(), xwindow(), cursor_ozone->xcursor());
+ }
+ 
++bool X11WindowOzone::RunMoveLoop(const gfx::Vector2d& drag_offset) {
++// TODO(msisov, tonikitoo): Add a dummy implementation for chromeos.
++#if !defined(OS_CHROMEOS)
++  DCHECK(move_loop_client_);
++  ReleaseCapture();
++  return move_loop_client_->RunMoveLoop(this, drag_offset);
++#endif
++  return true;
++}
++
++void X11WindowOzone::StopMoveLoop() {
++// TODO(msisov, tonikitoo): Add a dummy implementation for chromeos.
++#if !defined(OS_CHROMEOS)
++  ReleaseCapture();
++  move_loop_client_->EndMoveLoop();
++#endif
++}
++
+ void X11WindowOzone::CheckCanDispatchNextPlatformEvent(XEvent* xev) {
+   handle_next_event_ = xwindow() == x11::None ? false : IsEventForXWindow(*xev);
+ }
+@@ -69,8 +92,14 @@ bool X11WindowOzone::DispatchXEvent(XEvent* xev) {
+   return true;
+ }
+ 
+-bool X11WindowOzone::CanDispatchEvent(const PlatformEvent& event) {
+-  return handle_next_event_;
++bool X11WindowOzone::CanDispatchEvent(const PlatformEvent& platform_event) {
++  bool in_move_loop =
++#if !defined(OS_CHROMEOS)
++      move_loop_client_->IsInMoveLoop();
++#else
++      false;
++#endif
++  return handle_next_event_ || in_move_loop;
+ }
+ 
+ uint32_t X11WindowOzone::DispatchEvent(const PlatformEvent& event) {
+diff --git a/ui/ozone/platform/x11/x11_window_ozone.h b/ui/ozone/platform/x11/x11_window_ozone.h
+index e1586341f19d2..6be3f747549df 100644
+--- a/ui/ozone/platform/x11/x11_window_ozone.h
++++ b/ui/ozone/platform/x11/x11_window_ozone.h
+@@ -8,6 +8,7 @@
+ #include "base/macros.h"
+ #include "ui/events/platform/platform_event_dispatcher.h"
+ #include "ui/events/platform/x11/x11_event_source_libevent.h"
++#include "ui/platform_window/x11/window_move_loop_client.h"
+ #include "ui/platform_window/x11/x11_window_base.h"
+ 
+ namespace ui {
+@@ -30,8 +31,11 @@ class X11WindowOzone : public X11WindowBase,
+   // PlatformWindow:
+   void PrepareForShutdown() override;
+   void SetCapture() override;
++
+   void ReleaseCapture() override;
+   void SetCursor(PlatformCursor cursor) override;
++  bool RunMoveLoop(const gfx::Vector2d& drag_offset) override;
++  void StopMoveLoop() override;
+ 
+   // XEventDispatcher:
+   void CheckCanDispatchNextPlatformEvent(XEvent* xev) override;
+@@ -46,6 +50,11 @@ class X11WindowOzone : public X11WindowBase,
+ 
+   X11WindowManagerOzone* window_manager_;
+ 
++// TODO(msisov, tonikitoo): Add a dummy implementation for chromeos.
++#if !defined(OS_CHROMEOS)
++  std::unique_ptr<WindowMoveLoopClient> move_loop_client_;
++#endif
++
+   // Tells if this dispatcher can process next translated event based on a
+   // previous check in ::CheckCanDispatchNextPlatformEvent based on a XID
+   // target.
+diff --git a/ui/platform_window/platform_window.h b/ui/platform_window/platform_window.h
+index c7611eee8afd6..ec00f70cf28f9 100644
+--- a/ui/platform_window/platform_window.h
++++ b/ui/platform_window/platform_window.h
+@@ -71,6 +71,11 @@ class PlatformWindow : public PropertyHandler {
+   // Sets and gets the restored bounds of the platform-window.
+   virtual void SetRestoredBoundsInPixels(const gfx::Rect& bounds) = 0;
+   virtual gfx::Rect GetRestoredBoundsInPixels() const = 0;
++
++  // Asks to window move client to start move loop.
++  virtual bool RunMoveLoop(const gfx::Vector2d& drag_offset) = 0;
++
++  virtual void StopMoveLoop() = 0;
+ };
+ 
+ }  // namespace ui
+diff --git a/ui/platform_window/stub/stub_window.cc b/ui/platform_window/stub/stub_window.cc
+index 154d3e25248fd..070241e6327e4 100644
+--- a/ui/platform_window/stub/stub_window.cc
++++ b/ui/platform_window/stub/stub_window.cc
+@@ -80,4 +80,10 @@ gfx::Rect StubWindow::GetRestoredBoundsInPixels() const {
+   return gfx::Rect();
+ }
+ 
++bool StubWindow::RunMoveLoop(const gfx::Vector2d& drag_offset) {
++  return false;
++}
++
++void StubWindow::StopMoveLoop() {}
++
+ }  // namespace ui
+diff --git a/ui/platform_window/stub/stub_window.h b/ui/platform_window/stub/stub_window.h
+index f46c8aa955d11..73c8e20c6c965 100644
+--- a/ui/platform_window/stub/stub_window.h
++++ b/ui/platform_window/stub/stub_window.h
+@@ -50,6 +50,8 @@ class STUB_WINDOW_EXPORT StubWindow : public PlatformWindow {
+   PlatformImeController* GetPlatformImeController() override;
+   void SetRestoredBoundsInPixels(const gfx::Rect& bounds) override;
+   gfx::Rect GetRestoredBoundsInPixels() const override;
++  bool RunMoveLoop(const gfx::Vector2d& drag_offset) override;
++  void StopMoveLoop() override;
+ 
+   PlatformWindowDelegate* delegate_;
+   gfx::Rect bounds_;
+diff --git a/ui/platform_window/x11/BUILD.gn b/ui/platform_window/x11/BUILD.gn
+index 3e46e8c94c96b..0f737c7c2c1c9 100644
+--- a/ui/platform_window/x11/BUILD.gn
++++ b/ui/platform_window/x11/BUILD.gn
+@@ -34,7 +34,18 @@ jumbo_component("x11") {
+     "x11_window_export.h",
+   ]
+ 
+-  if (use_x11) {
++  if (ozone_platform_x11) {
++    sources += [
++      "whole_screen_move_loop.cc",
++      "whole_screen_move_loop.h",
++      "window_move_loop_client.cc",
++      "window_move_loop_client.h",
++    ]
++    deps += [
++      "//ui/base",
++      "//ui/base/x",
++    ]
++  } else if (use_x11) {
+     sources += [
+       "x11_window.cc",
+       "x11_window.h",
+diff --git a/ui/platform_window/x11/whole_screen_move_loop.cc b/ui/platform_window/x11/whole_screen_move_loop.cc
+new file mode 100644
+index 0000000000000..be2218fcf8168
+--- /dev/null
++++ b/ui/platform_window/x11/whole_screen_move_loop.cc
+@@ -0,0 +1,228 @@
++// Copyright (c) 2018 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "ui/platform_window/x11/whole_screen_move_loop.h"
++
++#include <stddef.h>
++#include <utility>
++
++#include "base/bind.h"
++#include "base/logging.h"
++#include "base/macros.h"
++#include "base/message_loop/message_loop.h"
++#include "base/run_loop.h"
++#include "base/single_thread_task_runner.h"
++#include "base/threading/thread_task_runner_handle.h"
++#include "ui/aura/client/capture_client.h"
++#include "ui/aura/env.h"
++#include "ui/aura/window.h"
++#include "ui/aura/window_event_dispatcher.h"
++#include "ui/aura/window_tree_host.h"
++#include "ui/base/x/x11_pointer_grab.h"
++#include "ui/base/x/x11_util.h"
++#include "ui/base/x/x11_window_event_manager.h"
++#include "ui/events/event.h"
++#include "ui/events/event_utils.h"
++#include "ui/events/keycodes/keyboard_code_conversion_x.h"
++#include "ui/events/ozone/events_ozone.h"
++#include "ui/events/platform/platform_event_source.h"
++#include "ui/events/platform/scoped_event_dispatcher.h"
++#include "ui/events/platform/x11/x11_event_source.h"
++#include "ui/events/platform/x11/x11_event_source_libevent.h"
++#include "ui/gfx/x/x11.h"
++#include "ui/platform_window/platform_window_delegate.h"
++
++namespace ui {
++
++// XGrabKey requires the modifier mask to explicitly be specified.
++const unsigned int kModifiersMasks[] = {0,         // No additional modifier.
++                                        Mod2Mask,  // Num lock
++                                        LockMask,  // Caps lock
++                                        Mod5Mask,  // Scroll lock
++                                        Mod2Mask | LockMask,
++                                        Mod2Mask | Mod5Mask,
++                                        LockMask | Mod5Mask,
++                                        Mod2Mask | LockMask | Mod5Mask};
++
++WholeScreenMoveLoop::WholeScreenMoveLoop(views::X11MoveLoopDelegate* delegate)
++    : delegate_(delegate),
++      in_move_loop_(false),
++      grab_input_window_(x11::None),
++      grabbed_pointer_(false),
++      canceled_(false),
++      weak_factory_(this) {}
++
++WholeScreenMoveLoop::~WholeScreenMoveLoop() {}
++
++void WholeScreenMoveLoop::DispatchMouseMovement() {
++  if (!last_motion_in_screen_ && !last_motion_in_screen_->IsLocatedEvent())
++    return;
++  delegate_->OnMouseMovement(
++      last_motion_in_screen_->AsLocatedEvent()->location(),
++      last_motion_in_screen_->flags(), last_motion_in_screen_->time_stamp());
++  last_motion_in_screen_.reset();
++}
++
++////////////////////////////////////////////////////////////////////////////////
++// DesktopWindowTreeHostLinux, ui::PlatformEventDispatcher implementation:
++
++bool WholeScreenMoveLoop::CanDispatchEvent(const ui::PlatformEvent& event) {
++  return in_move_loop_;
++}
++
++uint32_t WholeScreenMoveLoop::DispatchEvent(
++    const ui::PlatformEvent& platform_event) {
++  DCHECK(base::MessageLoopCurrentForUI::IsSet());
++
++  // This method processes all events while the move loop is active.
++  if (!in_move_loop_)
++    return ui::POST_DISPATCH_PERFORM_DEFAULT;
++
++  auto* event = static_cast<ui::Event*>(platform_event);
++  switch (event->type()) {
++    case ui::ET_MOUSE_MOVED:
++    case ui::ET_MOUSE_DRAGGED: {
++      bool can_send = !last_motion_in_screen_.get();
++
++      ui::MouseEvent* mouse_event = event->AsMouseEvent();
++      gfx::Point root_location = mouse_event->root_location();
++      mouse_event->set_location(root_location);
++
++      last_motion_in_screen_ = ui::Event::Clone(*event);
++      DCHECK(last_motion_in_screen_->IsMouseEvent());
++
++      if (can_send)
++        DispatchMouseMovement();
++      return ui::POST_DISPATCH_PERFORM_DEFAULT;
++    }
++    case ui::ET_MOUSE_RELEASED: {
++      ui::MouseEvent* mouse_event = event->AsMouseEvent();
++      gfx::Point root_location = mouse_event->root_location();
++      mouse_event->set_location(root_location);
++
++      last_motion_in_screen_ = ui::Event::Clone(*event);
++      DCHECK(last_motion_in_screen_->IsMouseEvent());
++
++      EndMoveLoop();
++      return ui::POST_DISPATCH_PERFORM_DEFAULT;
++    }
++    case ui::ET_KEY_PRESSED:
++      canceled_ = true;
++      EndMoveLoop();
++      return ui::POST_DISPATCH_NONE;
++    default:
++      break;
++  }
++  return ui::POST_DISPATCH_PERFORM_DEFAULT;
++}
++
++bool WholeScreenMoveLoop::RunMoveLoop() {
++  DCHECK(!in_move_loop_);  // Can only handle one nested loop at a time.
++
++  CreateDragInputWindow(gfx::GetXDisplay());
++
++  if (!GrabPointer()) {
++    XDestroyWindow(gfx::GetXDisplay(), grab_input_window_);
++    CHECK(false) << "failed to grab pointer";
++    return false;
++  }
++
++  GrabEscKey();
++
++  std::unique_ptr<ui::ScopedEventDispatcher> old_dispatcher =
++      std::move(nested_dispatcher_);
++  nested_dispatcher_ =
++      ui::PlatformEventSource::GetInstance()->OverrideDispatcher(this);
++
++  base::WeakPtr<WholeScreenMoveLoop> alive(weak_factory_.GetWeakPtr());
++
++  in_move_loop_ = true;
++  canceled_ = false;
++  base::MessageLoopCurrent::ScopedNestableTaskAllower allow_nested;
++  base::RunLoop run_loop;
++  quit_closure_ = run_loop.QuitClosure();
++  run_loop.Run();
++
++  if (!alive)
++    return false;
++
++  nested_dispatcher_ = std::move(old_dispatcher);
++  return !canceled_;
++}
++
++void WholeScreenMoveLoop::UpdateCursor() {}
++
++void WholeScreenMoveLoop::EndMoveLoop() {
++  if (!in_move_loop_)
++    return;
++
++  // Prevent DispatchMouseMovement from dispatching any posted motion event.
++  last_motion_in_screen_.reset();
++
++  // TODO(erg): Is this ungrab the cause of having to click to give input focus
++  // on drawn out windows? Not ungrabbing here screws the X server until I kill
++  // the chrome process.
++
++  // Ungrab before we let go of the window.
++  if (grabbed_pointer_)
++    ui::UngrabPointer();
++  else
++    UpdateCursor();
++
++  XDisplay* display = gfx::GetXDisplay();
++  unsigned int esc_keycode = XKeysymToKeycode(display, XK_Escape);
++  for (size_t i = 0; i < arraysize(kModifiersMasks); ++i) {
++    XUngrabKey(display, esc_keycode, kModifiersMasks[i], grab_input_window_);
++  }
++
++  // Restore the previous dispatcher.
++  nested_dispatcher_.reset();
++  grab_input_window_events_.reset();
++  XDestroyWindow(display, grab_input_window_);
++  grab_input_window_ = x11::None;
++  in_move_loop_ = false;
++  quit_closure_.Run();
++}
++
++bool WholeScreenMoveLoop::GrabPointer() {
++  XDisplay* display = gfx::GetXDisplay();
++
++  // Pass "owner_events" as false so that X sends all mouse events to
++  // |grab_input_window_|.
++  int ret = ui::GrabPointer(grab_input_window_, false, x11::None);
++  if (ret != GrabSuccess) {
++    DLOG(ERROR) << "Grabbing pointer for dragging failed: "
++                << ui::GetX11ErrorString(display, ret);
++  }
++  XFlush(display);
++  return ret == GrabSuccess;
++}
++
++void WholeScreenMoveLoop::GrabEscKey() {
++  XDisplay* display = gfx::GetXDisplay();
++  unsigned int esc_keycode = XKeysymToKeycode(display, XK_Escape);
++  for (size_t i = 0; i < arraysize(kModifiersMasks); ++i) {
++    XGrabKey(display, esc_keycode, kModifiersMasks[i], grab_input_window_,
++             x11::False, GrabModeAsync, GrabModeAsync);
++  }
++}
++
++void WholeScreenMoveLoop::CreateDragInputWindow(XDisplay* display) {
++  unsigned long attribute_mask = CWEventMask | CWOverrideRedirect;
++  XSetWindowAttributes swa;
++  memset(&swa, 0, sizeof(swa));
++  swa.override_redirect = x11::True;
++  grab_input_window_ = XCreateWindow(display, DefaultRootWindow(display), -100,
++                                     -100, 10, 10, 0, CopyFromParent, InputOnly,
++                                     CopyFromParent, attribute_mask, &swa);
++  uint32_t event_mask = ButtonPressMask | ButtonReleaseMask |
++                        PointerMotionMask | KeyPressMask | KeyReleaseMask |
++                        StructureNotifyMask;
++  grab_input_window_events_.reset(
++      new ui::XScopedEventSelector(grab_input_window_, event_mask));
++
++  XMapRaised(display, grab_input_window_);
++}
++
++}  // namespace ui
+diff --git a/ui/platform_window/x11/whole_screen_move_loop.h b/ui/platform_window/x11/whole_screen_move_loop.h
+new file mode 100644
+index 0000000000000..4a18fe908a1d7
+--- /dev/null
++++ b/ui/platform_window/x11/whole_screen_move_loop.h
+@@ -0,0 +1,90 @@
++// Copyright (c) 2018 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef UI_PLATFORM_WINDOW_X11_WHOLE_SCREEN_MOVE_LOOP_H_
++#define UI_PLATFORM_WINDOW_X11_WHOLE_SCREEN_MOVE_LOOP_H_
++
++#include <stdint.h>
++
++#include "base/callback.h"
++#include "base/compiler_specific.h"
++#include "base/macros.h"
++#include "base/memory/weak_ptr.h"
++#include "ui/base/cursor/cursor.h"
++#include "ui/events/platform/platform_event_dispatcher.h"
++#include "ui/gfx/geometry/vector2d_f.h"
++#include "ui/gfx/image/image_skia.h"
++#include "ui/gfx/native_widget_types.h"
++#include "ui/gfx/x/x11_types.h"
++#include "ui/views/widget/desktop_aura/x11_move_loop.h"
++#include "ui/views/widget/desktop_aura/x11_move_loop_delegate.h"
++
++namespace ui {
++class MouseEvent;
++class ScopedEventDispatcher;
++class XScopedEventSelector;
++class PlatformWindowDelegate;
++
++// Runs a nested run loop and grabs the mouse. This is used to implement
++// dragging.
++class WholeScreenMoveLoop : public ui::PlatformEventDispatcher {
++ public:
++  explicit WholeScreenMoveLoop(views::X11MoveLoopDelegate* delegate);
++  ~WholeScreenMoveLoop() override;
++
++  // ui:::PlatformEventDispatcher:
++  bool CanDispatchEvent(const ui::PlatformEvent& event) override;
++  uint32_t DispatchEvent(const ui::PlatformEvent& platform_event) override;
++
++  // X11MoveLoop:
++  bool RunMoveLoop();
++  void UpdateCursor();
++  void EndMoveLoop();
++
++  bool in_move_loop() { return in_move_loop_; }
++
++ private:
++  // Grabs the pointer, setting the mouse cursor to |cursor|. Returns true if
++  // successful.
++  bool GrabPointer();
++
++  void GrabEscKey();
++
++  // Creates an input-only window to be used during the drag.
++  void CreateDragInputWindow(XDisplay* display);
++
++  // Dispatch mouse movement event to |delegate_| in a posted task.
++  void DispatchMouseMovement();
++
++  views::X11MoveLoopDelegate* delegate_;
++
++  // Are we running a nested run loop from RunMoveLoop()?
++  bool in_move_loop_;
++  std::unique_ptr<ui::ScopedEventDispatcher> nested_dispatcher_;
++
++  // An invisible InputOnly window. Keyboard grab and sometimes mouse grab
++  // are set on this window.
++  XID grab_input_window_;
++
++  // Events selected on |grab_input_window_|.
++  std::unique_ptr<ui::XScopedEventSelector> grab_input_window_events_;
++
++  // Whether the pointer was grabbed on |grab_input_window_|.
++  bool grabbed_pointer_;
++
++  base::Closure quit_closure_;
++
++  // Keeps track of whether the move-loop is cancled by the user (e.g. by
++  // pressing escape).
++  bool canceled_;
++
++  std::unique_ptr<ui::Event> last_motion_in_screen_;
++  base::WeakPtrFactory<WholeScreenMoveLoop> weak_factory_;
++
++  DISALLOW_COPY_AND_ASSIGN(WholeScreenMoveLoop);
++};
++
++}  // namespace ui
++
++#endif  // UI_PLATFORM_WINDOW_X11_WHOLE_SCREEN_MOVE_LOOP_H_
+diff --git a/ui/platform_window/x11/window_move_loop_client.cc b/ui/platform_window/x11/window_move_loop_client.cc
+new file mode 100644
+index 0000000000000..cbfe515ddeef3
+--- /dev/null
++++ b/ui/platform_window/x11/window_move_loop_client.cc
+@@ -0,0 +1,62 @@
++// Copyright (c) 2018 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "ui/platform_window/x11/window_move_loop_client.h"
++
++#include <X11/Xlib.h>
++
++#include "base/debug/stack_trace.h"
++#include "base/message_loop/message_loop.h"
++#include "base/run_loop.h"
++#include "ui/aura/env.h"
++#include "ui/aura/window.h"
++#include "ui/aura/window_tree_host.h"
++#include "ui/base/x/x11_util.h"
++#include "ui/events/event.h"
++
++#include "ui/platform_window/platform_window.h"
++
++namespace ui {
++
++WindowMoveLoopClient::WindowMoveLoopClient()
++    : move_loop_(this), window_(nullptr) {}
++
++WindowMoveLoopClient::~WindowMoveLoopClient() {}
++
++void WindowMoveLoopClient::OnMouseMovement(const gfx::Point& screen_point,
++                                           int flags,
++                                           base::TimeTicks event_time) {
++  gfx::Point system_loc = screen_point - window_offset_;
++  window_->SetBounds(gfx::Rect(system_loc, gfx::Size()));
++}
++
++void WindowMoveLoopClient::OnMouseReleased() {
++  EndMoveLoop();
++}
++
++void WindowMoveLoopClient::OnMoveLoopEnded() {
++  window_ = nullptr;
++}
++
++////////////////////////////////////////////////////////////////////////////////
++// DesktopWindowTreeHostLinux, wm::WindowMoveClient implementation:
++
++bool WindowMoveLoopClient::RunMoveLoop(PlatformWindow* window,
++                                       const gfx::Vector2d& drag_offset) {
++  window_offset_ = drag_offset;
++  window_ = window;
++  window_->SetCapture();
++  return move_loop_.RunMoveLoop();
++}
++
++void WindowMoveLoopClient::EndMoveLoop() {
++  window_->ReleaseCapture();
++  move_loop_.EndMoveLoop();
++}
++
++bool WindowMoveLoopClient::IsInMoveLoop() {
++  return move_loop_.in_move_loop();
++}
++
++}  // namespace ui
+diff --git a/ui/platform_window/x11/window_move_loop_client.h b/ui/platform_window/x11/window_move_loop_client.h
+new file mode 100644
+index 0000000000000..2e191f87dc289
+--- /dev/null
++++ b/ui/platform_window/x11/window_move_loop_client.h
+@@ -0,0 +1,56 @@
++// Copyright (c) 2018 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef UI_PLATFORM_WINDOW_X11_WINDOW_MOVE_LOOP_CLIENT_H_
++#define UI_PLATFORM_WINDOW_X11_WINDOW_MOVE_LOOP_CLIENT_H_
++
++#include <X11/Xlib.h>
++
++#include "base/callback.h"
++#include "base/compiler_specific.h"
++#include "base/message_loop/message_loop.h"
++#include "ui/gfx/geometry/point.h"
++#include "ui/platform_window/x11/whole_screen_move_loop.h"
++#include "ui/platform_window/x11/x11_window_export.h"
++#include "ui/views/views_export.h"
++#include "ui/wm/public/window_move_client.h"
++
++namespace ui {
++
++class PlatformWindow;
++
++// When we're dragging tabs, we need to manually position our window.
++class X11_WINDOW_EXPORT WindowMoveLoopClient : public views::X11MoveLoopDelegate {
++ public:
++  WindowMoveLoopClient();
++  ~WindowMoveLoopClient() override;
++
++  // Overridden from X11MoveLoopDelegate:
++  void OnMouseMovement(const gfx::Point& screen_point,
++                       int flags,
++                       base::TimeTicks event_time) override;
++  void OnMouseReleased() override;
++  void OnMoveLoopEnded() override;
++
++  bool RunMoveLoop(PlatformWindow* window, const gfx::Vector2d& drag_offset);
++  void EndMoveLoop();
++
++  bool IsInMoveLoop();
++
++ private:
++  WholeScreenMoveLoop move_loop_;
++
++  // We need to keep track of this so we can actually move it when reacting to
++  // mouse events.
++  PlatformWindow* window_;
++
++  // Our cursor offset from the top left window origin when the drag
++  // started. Used to calculate the window's new bounds relative to the current
++  // location of the cursor.
++  gfx::Vector2d window_offset_;
++};
++
++}  // namespace ui
++
++#endif  // UI_PLATFORM_WINDOW_X11_WINDOW_MOVE_LOOP_CLIENT_H_
+diff --git a/ui/platform_window/x11/x11_window_base.cc b/ui/platform_window/x11/x11_window_base.cc
+index 51f5e8e17c380..1887b3b377a8a 100644
+--- a/ui/platform_window/x11/x11_window_base.cc
++++ b/ui/platform_window/x11/x11_window_base.cc
+@@ -203,7 +203,7 @@ void X11WindowBase::SetBounds(const gfx::Rect& bounds) {
+     XWindowChanges changes = {0};
+     unsigned value_mask = 0;
+ 
+-    if (bounds_.size() != bounds.size()) {
++    if (!bounds.size().IsEmpty() && bounds_.size() != bounds.size()) {
+       changes.width = bounds.width();
+       changes.height = bounds.height();
+       value_mask |= CWHeight | CWWidth;
+@@ -223,8 +223,13 @@ void X11WindowBase::SetBounds(const gfx::Rect& bounds) {
+   // case if we're running without a window manager.  If there's a window
+   // manager, it can modify or ignore the request, but (per ICCCM) we'll get a
+   // (possibly synthetic) ConfigureNotify about the actual size and correct
+-  // |bounds_| later.
++  // |bounds_| later. If |bounds| came with zero size, use the previous size
++  // of |bounds_|.
++  gfx::Size size = bounds_.size();
++  if (!bounds.size().IsEmpty())
++    size = bounds_.size();
+   bounds_ = bounds;
++  bounds_.set_size(size);
+ 
+   // Even if the pixel bounds didn't change this call to the delegate should
+   // still happen. The device scale factor may have changed which effectively
+@@ -343,6 +348,12 @@ gfx::Rect X11WindowBase::GetRestoredBoundsInPixels() const {
+   return gfx::Rect();
+ }
+ 
++bool X11WindowBase::RunMoveLoop(const gfx::Vector2d& drag_offset) {
++  return false;
++}
++
++void X11WindowBase::StopMoveLoop() {}
++
+ void X11WindowBase::UnConfineCursor() {
+   if (!has_pointer_barriers_)
+     return;
+diff --git a/ui/platform_window/x11/x11_window_base.h b/ui/platform_window/x11/x11_window_base.h
+index 10f6a818c332d..83a0c668186b8 100644
+--- a/ui/platform_window/x11/x11_window_base.h
++++ b/ui/platform_window/x11/x11_window_base.h
+@@ -50,6 +50,8 @@ class X11_WINDOW_EXPORT X11WindowBase : public PlatformWindow {
+   PlatformImeController* GetPlatformImeController() override;
+   void SetRestoredBoundsInPixels(const gfx::Rect& bounds) override;
+   gfx::Rect GetRestoredBoundsInPixels() const override;
++  bool RunMoveLoop(const gfx::Vector2d& drag_offset) override;
++  void StopMoveLoop() override;
+ 
+  protected:
+   // Creates new underlying XWindow. Does not map XWindow.
+@@ -58,6 +60,7 @@ class X11_WINDOW_EXPORT X11WindowBase : public PlatformWindow {
+   void Destroy();
+ 
+   PlatformWindowDelegate* delegate() { return delegate_; }
++
+   XDisplay* xdisplay() { return xdisplay_; }
+   XID xwindow() const { return xwindow_; }
+ 
+diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
+index 1aead10ddafd0..70141d54b1469 100644
+--- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
++++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
+@@ -376,14 +376,13 @@ Widget::MoveLoopResult DesktopWindowTreeHostPlatform::RunMoveLoop(
+     const gfx::Vector2d& drag_offset,
+     Widget::MoveLoopSource source,
+     Widget::MoveLoopEscapeBehavior escape_behavior) {
+-  // TODO: needs PlatformWindow support.
+-  NOTIMPLEMENTED_LOG_ONCE();
++  if (platform_window()->RunMoveLoop(drag_offset))
++    return Widget::MOVE_LOOP_SUCCESSFUL;
+   return Widget::MOVE_LOOP_CANCELED;
+ }
+ 
+ void DesktopWindowTreeHostPlatform::EndMoveLoop() {
+-  // TODO: needs PlatformWindow support.
+-  NOTIMPLEMENTED_LOG_ONCE();
++  platform_window()->StopMoveLoop();
+ }
+ 
+ void DesktopWindowTreeHostPlatform::SetVisibilityChangedAnimationsEnabled(
+diff --git a/ui/views/widget/desktop_aura/x11_move_loop_delegate.h b/ui/views/widget/desktop_aura/x11_move_loop_delegate.h
+index b5eee9b72572e..874468aa43783 100644
+--- a/ui/views/widget/desktop_aura/x11_move_loop_delegate.h
++++ b/ui/views/widget/desktop_aura/x11_move_loop_delegate.h
+@@ -14,6 +14,8 @@ namespace views {
+ // Receives mouse events while the X11MoveLoop is tracking a drag.
+ class X11MoveLoopDelegate {
+  public:
++  virtual ~X11MoveLoopDelegate() {}
++
+   // Called when we receive a mouse move event.
+   virtual void OnMouseMovement(const gfx::Point& screen_point,
+                                int flags,

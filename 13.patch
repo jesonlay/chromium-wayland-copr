@@ -1,0 +1,36 @@
+From 0235a03cf7933a37effd57abefc8ac03c2a04056 Mon Sep 17 00:00:00 2001
+From: Fergus Dall <sidereal@google.com>
+Date: Mon, 25 Feb 2019 07:00:37 +0000
+Subject: [PATCH] Add a comment warning people about changing CrostiniResult
+
+While investigating crbug.com/931678, it's become clear that the
+values of CrostiniResult have been re-numbered over time, despite
+being used in error messages and logs to diagnose issues. This CL adds
+a comment warning against doing this in future.
+
+Bug: 931678
+Change-Id: I8cf84d3b3673503533ebef274ad1b8aec4730204
+Reviewed-on: https://chromium-review.googlesource.com/c/1484886
+Commit-Queue: Fergus Dall <sidereal@google.com>
+Reviewed-by: Timothy Loh <timloh@chromium.org>
+Cr-Commit-Position: refs/heads/master@{#635038}
+---
+ chrome/browser/chromeos/crostini/crostini_manager.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/chrome/browser/chromeos/crostini/crostini_manager.h b/chrome/browser/chromeos/crostini/crostini_manager.h
+index d319fca81385f..29ab73c680263 100644
+--- a/chrome/browser/chromeos/crostini/crostini_manager.h
++++ b/chrome/browser/chromeos/crostini/crostini_manager.h
+@@ -33,6 +33,11 @@ class Profile;
+ namespace crostini {
+ 
+ // Result types for CrostiniManager::StartTerminaVmCallback etc.
++
++// WARNING: Do not remove or re-order these values, as they are used in user
++// visible error messages and logs. New entries should only be added to the end.
++// This message was added during development of M74, error codes from prior
++// versions may differ from the numbering here.
+ enum class CrostiniResult {
+   SUCCESS,
+   DBUS_ERROR,

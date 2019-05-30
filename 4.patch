@@ -1,0 +1,73 @@
+From 593451fd21717f540015fb2bb4a87cfc13006546 Mon Sep 17 00:00:00 2001
+From: Gyuyoung Kim <gyuyoung@igalia.com>
+Date: Mon, 25 Feb 2019 04:15:50 +0000
+Subject: [PATCH] BlinkMemoryMgt: Annotate IndexedDBDispatcher and IDBKey with
+ the macros of Allocator
+
+The OnionSoup effort has a goal of allocating all garbage-collectable Blink objects
+with Oilpan or PartitionAlloc. However, the some classes of //blink/renderer/modules/indexeddb
+have not yet been allocated with them so far. So their uses of non-garbage-collected
+objects should be restricted to cases where the garbage collector can discover their
+references. The macros of Allocator will be useful for the non-garbage-collected objects
+to avoid unintended allocations.
+
+After some analyzes, it was concluded that for the case of IDBKey class,
+it makes sense to use USING_FAST_MALLOC because it has supported various factory functions
+which have returned std::unique_ptr<IDBKey>.
+
+In IndexedDBDispatcher class case, it makes sense to use DISALLOW_NEW because it has been used
+by DEFINE_THREAD_SAFE_STATIC_LOCAL in IndexedDBDispatcher::GetInstanceForCurrentThread.
+
+Bug: 919389
+Change-Id: I58cc70743f072a944c53d31a981040f1072831f7
+Reviewed-on: https://chromium-review.googlesource.com/c/1484887
+Reviewed-by: Kentaro Hara <haraken@chromium.org>
+Commit-Queue: Gyuyoung Kim <gyuyoung@igalia.com>
+Cr-Commit-Position: refs/heads/master@{#635029}
+---
+ third_party/blink/renderer/modules/indexeddb/idb_key.h         | 3 +++
+ .../blink/renderer/modules/indexeddb/indexed_db_dispatcher.h   | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/third_party/blink/renderer/modules/indexeddb/idb_key.h b/third_party/blink/renderer/modules/indexeddb/idb_key.h
+index 2bfada4287770..960be7c163e80 100644
+--- a/third_party/blink/renderer/modules/indexeddb/idb_key.h
++++ b/third_party/blink/renderer/modules/indexeddb/idb_key.h
+@@ -35,6 +35,7 @@
+ #include "third_party/blink/public/mojom/indexeddb/indexeddb.mojom-shared.h"
+ #include "third_party/blink/renderer/modules/modules_export.h"
+ #include "third_party/blink/renderer/platform/shared_buffer.h"
++#include "third_party/blink/renderer/platform/wtf/allocator.h"
+ #include "third_party/blink/renderer/platform/wtf/forward.h"
+ #include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
+ #include "third_party/blink/renderer/platform/wtf/vector.h"
+@@ -49,6 +50,8 @@ namespace blink {
+ // primary keys and index keys. For this reason, keys are represented using a
+ // dedicated data type that fully exposes its contents to the backing store.
+ class MODULES_EXPORT IDBKey {
++  USING_FAST_MALLOC(IDBKey);
++
+  public:
+   typedef Vector<std::unique_ptr<IDBKey>> KeyArray;
+ 
+diff --git a/third_party/blink/renderer/modules/indexeddb/indexed_db_dispatcher.h b/third_party/blink/renderer/modules/indexeddb/indexed_db_dispatcher.h
+index 8d7b07f613707..85a6e27c56540 100644
+--- a/third_party/blink/renderer/modules/indexeddb/indexed_db_dispatcher.h
++++ b/third_party/blink/renderer/modules/indexeddb/indexed_db_dispatcher.h
+@@ -13,6 +13,7 @@
+ #include "third_party/blink/renderer/modules/indexeddb/indexed_db_database_callbacks_impl.h"
+ #include "third_party/blink/renderer/modules/indexeddb/web_idb_callbacks.h"
+ #include "third_party/blink/renderer/modules/modules_export.h"
++#include "third_party/blink/renderer/platform/wtf/allocator.h"
+ #include "third_party/blink/renderer/platform/wtf/hash_set.h"
+ #include "third_party/blink/renderer/platform/wtf/thread_specific.h"
+ 
+@@ -22,6 +23,8 @@ class WebIDBCursorImpl;
+ // Handle the indexed db related communication for this context thread - the
+ // main thread and each worker thread have their own copies.
+ class MODULES_EXPORT IndexedDBDispatcher {
++  DISALLOW_NEW();
++
+  public:
+   static void RegisterCursor(WebIDBCursorImpl* cursor);
+   static void UnregisterCursor(WebIDBCursorImpl* cursor);

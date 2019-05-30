@@ -1,0 +1,64 @@
+From 2f1eed3cd0d6ce42c92393cafddf450f730e3a70 Mon Sep 17 00:00:00 2001
+From: Kent Tamura <tkent@chromium.org>
+Date: Mon, 25 Feb 2019 06:22:53 +0000
+Subject: [PATCH] Remove number-stepup-stepdown-from-renderer.html from
+ TestExpectations
+
+The test is stable in recent runs.
+Reduce step counts to avoid timeouts just in case.
+
+Bug: 725545
+Change-Id: Ib45466a8710966fbb112f8d57fc481326554667c
+Reviewed-on: https://chromium-review.googlesource.com/c/1484395
+Commit-Queue: Yoshifumi Inoue <yosin@chromium.org>
+Auto-Submit: Kent Tamura <tkent@chromium.org>
+Reviewed-by: Yoshifumi Inoue <yosin@chromium.org>
+Cr-Commit-Position: refs/heads/master@{#635035}
+---
+ third_party/blink/web_tests/TestExpectations                  | 1 -
+ .../number/number-stepup-stepdown-from-renderer-expected.txt  | 4 ++--
+ .../forms/number/number-stepup-stepdown-from-renderer.html    | 4 ++--
+ 3 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/third_party/blink/web_tests/TestExpectations b/third_party/blink/web_tests/TestExpectations
+index 671109a134b08..dce5691ae93a3 100644
+--- a/third_party/blink/web_tests/TestExpectations
++++ b/third_party/blink/web_tests/TestExpectations
+@@ -4608,7 +4608,6 @@ crbug.com/721435 external/wpt/html/semantics/embedded-content/the-img-element/de
+ 
+ # Sheriff failures 2017-05-22
+ crbug.com/725542 [ Debug ] editing/selection/doubleclick-beside-cr-span.html [ Pass Timeout ]
+-crbug.com/725545 [ Debug ] fast/forms/number/number-stepup-stepdown-from-renderer.html [ Pass Timeout ]
+ 
+ # Sheriff failures 2017-05-23
+ crbug.com/725470 editing/shadow/doubleclick-on-meter-in-shadow-crash.html [ Crash Failure Pass ]
+diff --git a/third_party/blink/web_tests/fast/forms/number/number-stepup-stepdown-from-renderer-expected.txt b/third_party/blink/web_tests/fast/forms/number/number-stepup-stepdown-from-renderer-expected.txt
+index 60334077ea300..adda6a8b85b06 100644
+--- a/third_party/blink/web_tests/fast/forms/number/number-stepup-stepdown-from-renderer-expected.txt
++++ b/third_party/blink/web_tests/fast/forms/number/number-stepup-stepdown-from-renderer-expected.txt
+@@ -61,8 +61,8 @@ PASS stepUp("-7", "300", "") is "0"
+ PASS stepDown("7", "300", "") is "0"
+ PASS stepDown("-7", "300", "") is "-300"
+ Huge value and small step
+-PASS input.min = ""; stepUp("1e+308", "1", "", 999) is "1e+308"
+-PASS input.max = ""; stepDown("1e+308", "1", "", 999) is "1e+308"
++PASS input.min = ""; stepUp("1e+308", "100", "", 9) is "1e+308"
++PASS input.max = ""; stepDown("1e+308", "100", "", 9) is "1e+308"
+ Fractional numbers
+ PASS input.min = ""; stepUp("0", "0.33333333333333333", "", 3) is "1"
+ PASS stepUp("1", "0.1", "", 10) is "2"
+diff --git a/third_party/blink/web_tests/fast/forms/number/number-stepup-stepdown-from-renderer.html b/third_party/blink/web_tests/fast/forms/number/number-stepup-stepdown-from-renderer.html
+index f2376bb7ab471..4c03db4b87744 100644
+--- a/third_party/blink/web_tests/fast/forms/number/number-stepup-stepdown-from-renderer.html
++++ b/third_party/blink/web_tests/fast/forms/number/number-stepup-stepdown-from-renderer.html
+@@ -139,8 +139,8 @@
+ shouldBe('stepDown("7", "300", "")', '"0"');
+ shouldBe('stepDown("-7", "300", "")', '"-300"');
+ debug('Huge value and small step');
+-shouldBe('input.min = ""; stepUp("1e+308", "1", "", 999)', '"1e+308"');
+-shouldBe('input.max = ""; stepDown("1e+308", "1", "", 999)', '"1e+308"');
++shouldBe('input.min = ""; stepUp("1e+308", "100", "", 9)', '"1e+308"');
++shouldBe('input.max = ""; stepDown("1e+308", "100", "", 9)', '"1e+308"');
+ debug('Fractional numbers');
+ shouldBe('input.min = ""; stepUp("0", "0.33333333333333333", "", 3)', '"1"');
+ shouldBe('stepUp("1", "0.1", "", 10)', '"2"');

@@ -1,0 +1,74 @@
+From 9596497a6a293b4edd2f0fa503c7c37cb4b95778 Mon Sep 17 00:00:00 2001
+From: Wei Lee <wtlee@google.com>
+Date: Mon, 25 Feb 2019 08:48:27 +0000
+Subject: [PATCH] Allows Chrome Camera App works with dev-key
+
+This CL allows Chrome Camera App works with dev-key to make debug
+easier.
+
+Bug: b/117817062
+Change-Id: If08c868c24cdc8f46ef40022baedfc72a6e45b73
+Reviewed-on: https://chromium-review.googlesource.com/c/1482435
+Commit-Queue: Wei Lee <wtlee@chromium.org>
+Reviewed-by: Ben Wells <benwells@chromium.org>
+Cr-Commit-Position: refs/heads/master@{#635049}
+---
+ .../extensions/chrome_extensions_interface_registration.cc     | 3 ++-
+ chrome/common/extensions/extension_constants.cc                | 1 +
+ chrome/common/extensions/extension_constants.h                 | 2 ++
+ extensions/common/api/_api_features.json                       | 3 ++-
+ 4 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/chrome/browser/extensions/chrome_extensions_interface_registration.cc b/chrome/browser/extensions/chrome_extensions_interface_registration.cc
+index a1dd82b398d2f..3cae620e1ada8 100644
+--- a/chrome/browser/extensions/chrome_extensions_interface_registration.cc
++++ b/chrome/browser/extensions/chrome_extensions_interface_registration.cc
+@@ -90,7 +90,8 @@ void RegisterChromeInterfacesForExtension(
+                               base::Unretained(delegate)));
+     }
+   }
+-  if (extension->id().compare(extension_misc::kChromeCameraAppId) == 0) {
++  if (extension->id().compare(extension_misc::kChromeCameraAppId) == 0 ||
++      extension->id().compare(extension_misc::kChromeCameraAppDevId) == 0) {
+     registry->AddInterface(
+         base::BindRepeating(&ForwardRequest<cros::mojom::CrosImageCapture>,
+                             video_capture::mojom::kServiceName));
+diff --git a/chrome/common/extensions/extension_constants.cc b/chrome/common/extensions/extension_constants.cc
+index 94d72fed98b8f..5cf7246a970f3 100644
+--- a/chrome/common/extensions/extension_constants.cc
++++ b/chrome/common/extensions/extension_constants.cc
+@@ -71,6 +71,7 @@ const char kWallpaperManagerId[] = "obklkkbkpaoaejdabbfldmcfplpdgolj";
+ const char kZipArchiverExtensionId[] = "dmboannefpncccogfdikhmhpmdnddgoe";
+ const char kZipArchiverExtensionPath[] = "chromeos/zip_archiver";
+ const char kChromeCameraAppId[] = "hfhhnacclhffhdffklopdkcgdhifgngh";
++const char kChromeCameraAppDevId[] = "flgnmkgjffmkephdokeeliiopbjaafpm";
+ const char kChromeCameraAppPath[] = "chromeos/camera";
+ const char kContainedHomeAppId[] = "nbaolgedfgoedkjbfmpediclncanmpbc";
+ #endif
+diff --git a/chrome/common/extensions/extension_constants.h b/chrome/common/extensions/extension_constants.h
+index 4ae3582bf7da0..e6217d619d9ad 100644
+--- a/chrome/common/extensions/extension_constants.h
++++ b/chrome/common/extensions/extension_constants.h
+@@ -231,6 +231,8 @@ extern const char kZipArchiverExtensionId[];
+ extern const char kZipArchiverExtensionPath[];
+ // The app ID of Chrome camera app.
+ extern const char kChromeCameraAppId[];
++// The dev app ID of Chrome camera app.
++extern const char kChromeCameraAppDevId[];
+ // Path to preinstalled Chrome camera app.
+ extern const char kChromeCameraAppPath[];
+ // The app ID of the contained home app.
+diff --git a/extensions/common/api/_api_features.json b/extensions/common/api/_api_features.json
+index d1fcd83747299..2e11885816181 100644
+--- a/extensions/common/api/_api_features.json
++++ b/extensions/common/api/_api_features.json
+@@ -348,7 +348,8 @@
+     "whitelist": [
+       "63ED55E43214C211F82122ED56407FF1A807F2A3",   // Media Router Dev
+       "226CF815E39A363090A1E547D53063472B8279FA",   // Media Router Stable
+-      "A3E3DE9E9F16B41D4A2FAD106BD6CA76B94A0C94"    // Chrome Camera App Prod
++      "B41E7F08E1179CC03CBD1F49E57CF353A40ADE07",   // Chrome Camera App Dev
++      "A3E3DE9E9F16B41D4A2FAD106BD6CA76B94A0C94"    // Chrome Camera App Stable
+     ]
+   },
+   "networking.config": {

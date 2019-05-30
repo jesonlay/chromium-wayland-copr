@@ -1,0 +1,43 @@
+From 898b1a4fcbcd8b8605ce846bf9c2052f52e69686 Mon Sep 17 00:00:00 2001
+From: John Z Wu <jzw@chromium.org>
+Date: Mon, 25 Feb 2019 08:52:06 +0000
+Subject: [PATCH] Drop ios 10 for //ios/web_view.
+
+Bug: 924402
+Change-Id: I9196eb291f177ecb2984dcb0d28b4fbfd649a61e
+Reviewed-on: https://chromium-review.googlesource.com/c/1485697
+Reviewed-by: Hiroshi Ichikawa <ichikawa@chromium.org>
+Commit-Queue: Hiroshi Ichikawa <ichikawa@chromium.org>
+Auto-Submit: John Wu <jzw@chromium.org>
+Cr-Commit-Position: refs/heads/master@{#635050}
+---
+ ios/web_view/tools/build.py | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/ios/web_view/tools/build.py b/ios/web_view/tools/build.py
+index ecffe845620e0..d83c92f0e5e86 100755
+--- a/ios/web_view/tools/build.py
++++ b/ios/web_view/tools/build.py
+@@ -37,11 +37,9 @@ def build(build_config, target_device, extra_gn_options, extra_ninja_options):
+       of the ninja build command.
+   """
+   if target_device == 'iphoneos':
+-    target_cpu = 'arm'
+-    additional_cpu = 'arm64'
++    target_cpu = 'arm64'
+   else:
+-    target_cpu = 'x86'
+-    additional_cpu = 'x64'
++    target_cpu = 'x64'
+ 
+   if build_config == 'Debug':
+     build_config_gn_args = 'is_debug=true'
+@@ -236,8 +234,6 @@ def main():
+   else:
+     extra_gn_options += 'ios_web_view_enable_autofill=false '
+   extra_gn_options += 'ios_web_view_output_name="%s" ' % output_name
+-  # This is needed until all clients drop iOS 10 support.
+-  extra_gn_options += 'ios_deployment_target="10.0" '
+   # This prevents Breakpad from being included in the final binary to avoid
+   # duplicate symbols with the client app.
+   extra_gn_options += 'use_crash_key_stubs=true '
