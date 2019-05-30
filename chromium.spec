@@ -43,7 +43,7 @@
 # Disabled by default because it causes out-of-memory error on Fedora Copr
 %bcond_with fedora_compilation_flags
 
-Name:       chromium
+Name:       chromium-wayland
 Version:    74.0.3718.0
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
@@ -73,12 +73,12 @@ Source3:    chromium-ffmpeg-free-sources.py
 # The following two source files are copied and modified from
 # https://repos.fedorapeople.org/repos/spot/chromium/
 Source10:   chromium-browser.sh
-Source11:   chromium-browser.desktop
+Source11:   chromium-wayland.desktop
 
 # The following two source files are copied verbatim from
 # https://src.fedoraproject.org/cgit/rpms/chromium.git/tree/
-Source12:   chromium-browser.xml
-Source13:   chromium-browser.appdata.xml
+Source12:   chromium-wayland.xml
+Source13:   chromium-wayland.appdata.xml
 
 # Disable non-free unrar
 # Patch20:    chromium-disable-unrar.patch
@@ -194,7 +194,7 @@ BuildRequires: pkgconfig(libxslt)
 BuildRequires: opus-devel
 BuildRequires: re2-devel
 BuildRequires: snappy-devel
-BuildRequires: yasm
+BuildRequires: yasmml
 BuildRequires: zlib-devel
 # use_*
 BuildRequires: pciutils-devel
@@ -208,22 +208,9 @@ Requires(post):   desktop-file-utils
 Requires(postun): desktop-file-utils
 Requires:         hicolor-icon-theme
 
-Obsoletes:     chromedriver <= %{version}-%{release}
-Obsoletes:     chromium-common <= %{version}-%{release}
-Obsoletes:     chromium-headless <= %{version}-%{release}
-Obsoletes:     chromium-libs <= %{version}-%{release}
-Obsoletes:     chromium-libs-media <= %{version}-%{release}
-Provides:      chromedriver = %{version}-%{release}
-Provides:      chromium-common = %{version}-%{release}
-Provides:      chromium-headless = %{version}-%{release}
-Provides:      chromium-libs = %{version}-%{release}
-Provides:      chromium-libs-media = %{version}-%{release}
 
-Provides:      chromedriver-stable = %{version}-%{release}
-Conflicts:     chromedriver-testing
-Conflicts:     chromedriver-unstable
 
-%global chromiumdir %{_libdir}/chromium-browser
+%global chromiumdir %{_libdir}/%{name}
 %global __provides_exclude_from ^%{chromiumdir}/.*$
 
 %if !%{with symbol}
@@ -305,6 +292,8 @@ gn_args=(
     use_custom_libcxx=false
     use_aura=true
     use_ozone=true
+    use_system_libdrm=true
+    ozone_platform_wayland=true
     use_xkbcommon=true
     use_system_minigbm=true
     use_cups=true
@@ -372,14 +361,14 @@ mkdir -p %{buildroot}%{_datadir}/applications
 mkdir -p %{buildroot}%{_datadir}/gnome-control-center/default-apps
 sed -e "s|@@CHROMIUMDIR@@|%{chromiumdir}|" -e "s|@@BUILDTARGET@@|`cat /etc/redhat-release`|" \
     %{SOURCE10} > chromium-browser.sh
-install -m 755 chromium-browser.sh %{buildroot}%{_bindir}/chromium-browser
+install -m 755 chromium-browser.sh %{buildroot}%{_bindir}/%{name}
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE11}
 install -m 644 %{SOURCE12} %{buildroot}%{_datadir}/gnome-control-center/default-apps/
 appstream-util validate-relax --nonet %{SOURCE13}
 install -m 644 %{SOURCE13} %{buildroot}%{_datadir}/appdata/
 sed -e "s|@@MENUNAME@@|Chromium|g" -e "s|@@PACKAGE@@|chromium|g" \
     chrome/app/resources/manpage.1.in > chrome.1
-install -m 644 chrome.1 %{buildroot}%{_mandir}/man1/chromium-browser.1
+install -m 644 chrome.1 %{buildroot}%{_mandir}/man1/chromium-wayland.1
 install -m 755 out/Release/chrome %{buildroot}%{chromiumdir}/chromium-browser
 install -m 4755 out/Release/chrome_sandbox %{buildroot}%{chromiumdir}/chrome-sandbox
 install -m 755 out/Release/chromedriver %{buildroot}%{chromiumdir}/
@@ -394,14 +383,14 @@ install -m 755 out/Release/swiftshader/*.so %{buildroot}%{chromiumdir}/swiftshad
 for i in 16 32; do
     mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps
     install -m 644 chrome/app/theme/default_100_percent/chromium/product_logo_$i.png \
-        %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-browser.png
+        %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-wayland.png
 done
 for i in 22 24 32 48 64 128 256; do
     if [ ${i} = 32 ]; then ext=xpm; else ext=png; fi
     if [ ${i} = 32 ]; then dir=linux/; else dir=; fi
     mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps
     install -m 644 chrome/app/theme/chromium/${dir}product_logo_$i.${ext} \
-        %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-browser.${ext}
+        %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-wayland.${ext}
 done
 
 %post
@@ -422,20 +411,20 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %files
 %license LICENSE
 %doc AUTHORS README.md
-%{_bindir}/chromium-browser
-%{_datadir}/appdata/chromium-browser.appdata.xml
-%{_datadir}/applications/chromium-browser.desktop
-%{_datadir}/gnome-control-center/default-apps/chromium-browser.xml
-%{_datadir}/icons/hicolor/16x16/apps/chromium-browser.png
-%{_datadir}/icons/hicolor/22x22/apps/chromium-browser.png
-%{_datadir}/icons/hicolor/24x24/apps/chromium-browser.png
-%{_datadir}/icons/hicolor/32x32/apps/chromium-browser.png
-%{_datadir}/icons/hicolor/32x32/apps/chromium-browser.xpm
-%{_datadir}/icons/hicolor/48x48/apps/chromium-browser.png
-%{_datadir}/icons/hicolor/64x64/apps/chromium-browser.png
-%{_datadir}/icons/hicolor/128x128/apps/chromium-browser.png
-%{_datadir}/icons/hicolor/256x256/apps/chromium-browser.png
-%{_mandir}/man1/chromium-browser.1.gz
+%{_bindir}/chromium-wayland
+%{_datadir}/appdata/chromium-wayland.appdata.xml
+%{_datadir}/applications/chromium-wayland.desktop
+%{_datadir}/gnome-control-center/default-apps/chromium-wayland.xml
+%{_datadir}/icons/hicolor/16x16/apps/chromium-wayland.png
+%{_datadir}/icons/hicolor/22x22/apps/chromium-wayland.png
+%{_datadir}/icons/hicolor/24x24/apps/chromium-wayland.png
+%{_datadir}/icons/hicolor/32x32/apps/chromium-wayland.png
+%{_datadir}/icons/hicolor/32x32/apps/chromium-wayland.xpm
+%{_datadir}/icons/hicolor/48x48/apps/chromium-wayland.png
+%{_datadir}/icons/hicolor/64x64/apps/chromium-wayland.png
+%{_datadir}/icons/hicolor/128x128/apps/chromium-wayland.png
+%{_datadir}/icons/hicolor/256x256/apps/chromium-wayland.png
+%{_mandir}/man1/chromium-wayland.1
 %dir %{chromiumdir}
 %{chromiumdir}/chromium-browser
 %{chromiumdir}/chrome-sandbox

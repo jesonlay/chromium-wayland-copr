@@ -39,12 +39,16 @@ export CHROME_VERSION_EXTRA="Built from source for @@BUILD_TARGET@@"
 # We don't want bug-buddy intercepting our crashes. http://crbug.com/24120
 export GNOME_DISABLE_CRASH_DIALOG=SET_BY_GOOGLE_CHROME
 
+if [ $XDG_SESSION_TYPE == "wayland" ]; then
+CHROMIUM_DISTRO_FLAGS+=" --ozone-platform=wayland \ "
+fi
+
 CHROMIUM_DISTRO_FLAGS=" --enable-plugins \
                         --enable-extensions \
                         --enable-user-scripts \
                         --enable-printing \
                         --enable-sync \
-                        --auto-ssl-client-auth @@EXTRA_FLAGS@@"
+                        --auto-ssl-client-auth"
 
 if [ -f "$HERE/PepperFlash/libpepflashplayer.so" ] && [ -f "$HERE/PepperFlash/manifest.json" ] ; then
   CHROMIUM_FLASH_VERSION=$(grep '"version":' "$HERE/PepperFlash/manifest.json" | awk -F\" '{ print $4 }')
@@ -54,4 +58,4 @@ else
   CHROMIUM_FLASH_FLAGS=""
 fi
 
-exec -a "$0" "$HERE/@@CHROMIUM_BROWSER_CHANNEL@@" $CHROMIUM_DISTRO_FLAGS $CHROMIUM_FLASH_FLAGS "$@"
+exec -a "$0" "@@CHROMIUMDIR@@/$(basename "$0" | sed 's/\.sh$//')" $CHROMIUM_DISTRO_FLAGS $CHROMIUM_FLASH_FLAGS "$@"
