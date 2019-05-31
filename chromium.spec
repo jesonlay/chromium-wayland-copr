@@ -9,7 +9,7 @@
 # $ curl -s 'https://omahaproxy.appspot.com/all?os=linux&channel=stable' | sed 1d | cut -d , -f 3
 
 # Require harfbuzz >= 1.8.6 for hb_font_funcs_set_glyph_h_advances_func
-%if 0%{?fedora} >= 29
+%if 0%{?fedora} >= 30
 %bcond_without system_harfbuzz
 %else
 %bcond_with system_harfbuzz
@@ -44,7 +44,7 @@
 %bcond_with fedora_compilation_flags
 
 Name:       chromium-wayland
-Version:    74.0.3718.0
+Version:    74.0.3729.169
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
@@ -65,7 +65,7 @@ Source0:    https://commondatastorage.googleapis.com/chromium-browser-official/c
 #
 # The repackaged source tarball used here is produced by:
 # ./chromium-latest.py --stable --ffmpegclean --ffmpegarm --deleteunrar
-#Source0:    chromium-%{version}-clean.tar.xz
+
 Source1:    chromium-latest.py
 Source2:    chromium-ffmpeg-clean.sh
 Source3:    chromium-ffmpeg-free-sources.py
@@ -89,54 +89,38 @@ Source13:   chromium-wayland.appdata.xml
 # Don't use unversioned python commands. This patch is based on
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
-Patch60:    chromium-bootstrap-python2.patch
+Patch60:    chromium-python2.patch
 
-# Add patches from upstream to fix build with GCC
-# Patch70:    chromium-gcc8-r588316.patch
-# Patch71:    chromium-gcc8-r588547.patch
-# Patch72:    chromium-gcc8-r589614.patch
+# Pull upstream patches
+Patch70:    chromium-gcc8-r641329.patch
+Patch71:    chromium-gcc8-r641404.patch
+Patch72:    chromium-gcc8-r642680.patch
+Patch73:    chromium-gcc8-r647271.patch
+Patch74:    chromium-gcc8-r647382.patch
+Patch75:    chromium-gcc8-cl1503254.patch
 
-# Add patches from upstream to fix GN bootstrap
-# Patch80:    chromium-gn-r607596.patch
-# I don't have time to test whether it work on other architectures
-Patch81:     1.patch
-Patch82:     2.patch
-Patch83:     3.patch
-Patch84:     4.patch
-Patch85:     5.patch
-Patch86:     6.patch
-Patch87:     7.patch
-Patch88:     8.patch
-Patch89:     9.patch
-Patch90:     10.patch
-Patch91:     11.patch
-Patch92:     12.patch
-Patch93:     13.patch
-Patch94:     14.patch
-Patch95:     15.patch
-Patch96:     16.patch
-Patch97:     17.patch
-Patch98:     18.patch
-Patch99:     19.patch
-Patch100:     20.patch
-Patch101:     21.patch
-Patch102:     22.patch
-Patch103:     23.patch
-Patch104:     24.patch
-Patch105:     25.patch
-Patch106:     26.patch
-Patch107:     27.patch
-Patch108:     28.patch
-Patch109:     29.patch
-Patch110:     30.patch
-Patch111:     31.patch
-Patch112:     32.patch
-Patch113:     33.patch
-Patch114:     34.patch
-Patch115:     35.patch
-Patch116:     36.patch
-Patch117:     37.patch
-Patch118:     38.patch
+# Pull patches from Fedora
+# https://src.fedoraproject.org/rpms/chromium/c/9071ee2d2f996b84
+Patch80:    chromium-webrtc-cstring.patch
+
+# Revert upstream patches which cause errors
+# https://crbug.com/gn/77
+Patch90:    chromium-gn-revert-bug-77.patch
+
+
+
+Patch101: 	ozone-01-gbm_wrapper.patch
+Patch102: 	ozone-02-software-render.patch
+Patch103: 	ozone-03-V4L2VDA.patch
+Patch104: 	ozone-04-mmap-libv4l.patch
+Patch105: 	ozone-05-remove-decorations.patch
+Patch106: 	ozone-06-popup-window-x11.patch
+Patch107: 	ozone-07-tabdrag.patch
+Patch108: 	ozone-08-fakeinputmethodcontextfactory.patch
+Patch109: 	ozone-09-tabdragx11.patch
+Patch110: 	ozone-10-move-resize.patch
+Patch111: 	ozone-11-tests-filter.patch
+Patch112: 	ozone-12-vaapi-build.patch
 
 
 ExclusiveArch: x86_64
@@ -221,7 +205,7 @@ Requires:         hicolor-icon-theme
 
 
 %prep
-%autosetup -p1
+%autosetup -n chromium-%{version} -p1
 
 # Don't use unversioned python commands in shebangs. This command is based on
 # https://src.fedoraproject.org/rpms/chromium/c/cdad6219176a7615
