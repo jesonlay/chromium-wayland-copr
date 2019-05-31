@@ -109,18 +109,18 @@ Patch90:    chromium-gn-revert-bug-77.patch
 
 
 
-Patch101: 	ozone-01-gbm_wrapper.patch
-Patch102: 	ozone-02-software-render.patch
-Patch103: 	ozone-03-V4L2VDA.patch
-Patch104: 	ozone-04-mmap-libv4l.patch
-Patch105: 	ozone-05-remove-decorations.patch
-Patch106: 	ozone-06-popup-window-x11.patch
-Patch107: 	ozone-07-tabdrag.patch
-Patch108: 	ozone-08-fakeinputmethodcontextfactory.patch
-Patch109: 	ozone-09-tabdragx11.patch
-Patch110: 	ozone-10-move-resize.patch
-Patch111: 	ozone-11-tests-filter.patch
-Patch112: 	ozone-12-vaapi-build.patch
+#Patch101: 	ozone-01-gbm_wrapper.patch
+#Patch102: 	ozone-02-software-render.patch
+#Patch103: 	ozone-03-V4L2VDA.patch
+#Patch104: 	ozone-04-mmap-libv4l.patch
+#Patch105: 	ozone-05-remove-decorations.patch
+#Patch106: 	ozone-06-popup-window-x11.patch
+#Patch107: 	ozone-07-tabdrag.patch
+#Patch108: 	ozone-08-fakeinputmethodcontextfactory.patch
+#Patch109: 	ozone-09-tabdragx11.patch
+#Patch110: 	ozone-10-move-resize.patch
+#Patch111: 	ozone-11-tests-filter.patch
+#Patch112: 	ozone-12-vaapi-build.patch
 
 
 ExclusiveArch: x86_64
