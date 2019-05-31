@@ -178,7 +178,7 @@ BuildRequires: pkgconfig(libxslt)
 BuildRequires: opus-devel
 BuildRequires: re2-devel
 BuildRequires: snappy-devel
-BuildRequires: yasmml
+BuildRequires: yasm
 BuildRequires: zlib-devel
 # use_*
 BuildRequires: pciutils-devel
