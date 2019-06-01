@@ -269,6 +269,9 @@ export CC=gcc CXX=g++
 export CXXFLAGS="$CXXFLAGS -fno-delete-null-pointer-checks -fpermissive"
 %endif
 
+# GN needs gold to bootstrap
+export LDFLAGS="$LDFLAGS -fuse-ld=gold"
+
 gn_args=(
     is_debug=false
     is_component_build=false
