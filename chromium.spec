@@ -131,7 +131,7 @@ ExclusiveArch: x86_64
 BuildRequires: clang, llvm
 %endif
 # Basic tools and libraries
-BuildRequires: ninja-build, nodejs, bison, gperf, hwdata
+BuildRequires: ninja-build, nodejs, java-headless, bison, gperf, hwdata
 BuildRequires: libgcc(x86-32), glibc(x86-32), libatomic
 BuildRequires: libcap-devel, cups-devel, alsa-lib-devel
 %if 0%{?fedora} >= 30
