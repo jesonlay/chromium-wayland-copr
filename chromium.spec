@@ -21,6 +21,9 @@
 # https://github.com/dabeaz/ply/issues/66
 %bcond_without system_ply
 
+# Requires re2 2016.07.21 for re2::LazyRE2
+%bcond_with system_re2
+
 # Allow testing whether icu can be unbundled
 %bcond_with system_libicu
 
@@ -234,7 +237,9 @@ find -type f -exec \
 %endif
     libxslt \
     opus \
+%if %{with system_re2}
     re2 \
+%endif
     snappy \
     yasm \
     zlib
