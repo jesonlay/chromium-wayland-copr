@@ -266,7 +266,6 @@ export LDFLAGS='%{__global_ldflags}'
 export CC=clang CXX=clang++
 %else
 export CC=gcc CXX=g++
-export CXXFLAGS="$CXXFLAGS -fno-delete-null-pointer-checks -fpermissive"
 %endif
 
 # GN needs gold to bootstrap
@@ -278,14 +277,15 @@ gn_args=(
     use_sysroot=false
     use_custom_libcxx=false
     use_aura=true
+    use_xkbcommon=true
     use_ozone=true
     use_system_libdrm=true
     ozone_platform_wayland=true
-    use_xkbcommon=true
     use_system_minigbm=true
     use_cups=true
     remove_webcore_debug_symbols=true
     use_gnome_keyring=true
+    use_jumbo_build=true
     use_gio=true
     use_kerberos=true
     use_libpci=true
