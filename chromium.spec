@@ -215,6 +215,195 @@ Requires:         hicolor-icon-theme
 find -type f -exec \
     sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' '{}' '+'
 
+./build/linux/unbundle/remove_bundled_libraries.py --do-remove \
+    base/third_party/dmg_fp \
+    base/third_party/dynamic_annotations \
+    base/third_party/icu \
+    base/third_party/libevent \
+    base/third_party/nspr \
+    base/third_party/superfasthash \
+    base/third_party/symbolize \
+    base/third_party/valgrind \
+    base/third_party/xdg_mime \
+    base/third_party/xdg_user_dirs \
+    buildtools/third_party/libc++ \
+    buildtools/third_party/libc++abi \
+    chrome/third_party/mozilla_security_manager \
+    courgette/third_party \
+    native_client/src/third_party/dlmalloc \
+    native_client/src/third_party/valgrind \
+    net/third_party/mozilla_security_manager \
+    net/third_party/nss \
+    net/third_party/quic \
+    net/third_party/uri_template \
+    third_party/abseil-cpp \
+    third_party/adobe \
+    third_party/angle \
+    third_party/angle/src/common/third_party/base \
+    third_party/angle/src/common/third_party/smhasher \
+    third_party/angle/src/common/third_party/xxhash \
+    third_party/angle/src/third_party/compiler \
+    third_party/angle/src/third_party/libXNVCtrl \
+    third_party/angle/src/third_party/trace_event \
+    third_party/angle/third_party/glslang \
+    third_party/angle/third_party/spirv-headers \
+    third_party/angle/third_party/spirv-tools \
+    third_party/angle/third_party/vulkan-headers \
+    third_party/angle/third_party/vulkan-loader \
+    third_party/angle/third_party/vulkan-tools \
+    third_party/angle/third_party/vulkan-validation-layers \
+    third_party/apple_apsl \
+    third_party/boringssl \
+    third_party/boringssl/src/third_party/fiat \
+    third_party/blink \
+    third_party/breakpad \
+    third_party/breakpad/breakpad/src/third_party/curl \
+    third_party/brotli \
+    third_party/cacheinvalidation \
+    third_party/catapult \
+    third_party/catapult/common/py_vulcanize/third_party/rcssmin \
+    third_party/catapult/common/py_vulcanize/third_party/rjsmin \
+    third_party/catapult/third_party/polymer \
+    third_party/catapult/tracing/third_party/d3 \
+    third_party/catapult/tracing/third_party/gl-matrix \
+    third_party/catapult/tracing/third_party/jszip \
+    third_party/catapult/tracing/third_party/mannwhitneyu \
+    third_party/catapult/tracing/third_party/oboe \
+    third_party/catapult/tracing/third_party/pako \
+    third_party/ced \
+    third_party/cld_3 \
+    third_party/closure_compiler \
+    third_party/crashpad \
+    third_party/crashpad/crashpad/third_party/zlib \
+    third_party/crc32c \
+    third_party/cros_system_api \
+    third_party/dav1d \
+    third_party/devscripts \
+    third_party/dom_distiller_js \
+    third_party/emoji-segmenter \
+    third_party/ffmpeg \
+    third_party/fips181 \
+    third_party/flatbuffers \
+    third_party/flot \
+    third_party/freetype \
+    third_party/glslang \
+    third_party/google_input_tools \
+    third_party/google_input_tools/third_party/closure_library \
+    third_party/google_input_tools/third_party/closure_library/third_party/closure \
+    third_party/googletest \
+%if !%{with system_harfbuzz}
+    third_party/harfbuzz-ng \
+%endif
+    third_party/hunspell \
+    third_party/iccjpeg \
+%if !%{with system_libicu}
+    third_party/icu \
+%endif
+    third_party/inspector_protocol \
+    third_party/jinja2 \
+    third_party/jsoncpp \
+    third_party/jstemplate \
+    third_party/khronos \
+    third_party/leveldatabase \
+    third_party/libaddressinput \
+    third_party/libaom \
+    third_party/libaom/source/libaom/third_party/vector \
+    third_party/libaom/source/libaom/third_party/x86inc \
+    third_party/libjingle \
+    third_party/libphonenumber \
+    third_party/libsecret \
+    third_party/libsrtp \
+    third_party/libsync \
+    third_party/libudev \
+%if !%{with system_libvpx}
+    third_party/libvpx \
+    third_party/libvpx/source/libvpx/third_party/x86inc \
+%endif
+    third_party/libwebm \
+%if %{with system_libxml2}
+    third_party/libxml/chromium \
+%else
+    third_party/libxml \
+%endif
+    third_party/libXNVCtrl \
+    third_party/libyuv \
+    third_party/lss \
+    third_party/lzma_sdk \
+    third_party/mesa \
+    third_party/metrics_proto \
+    third_party/modp_b64 \
+    third_party/nasm \
+    third_party/node \
+    third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2 \
+    third_party/openh264 \
+    third_party/openmax_dl \
+    third_party/ots \
+    third_party/pdfium \
+    third_party/pdfium/third_party/agg23 \
+    third_party/pdfium/third_party/base \
+    third_party/pdfium/third_party/bigint \
+    third_party/pdfium/third_party/freetype \
+    third_party/pdfium/third_party/lcms \
+    third_party/pdfium/third_party/libopenjpeg20 \
+    third_party/pdfium/third_party/libpng16 \
+    third_party/pdfium/third_party/libtiff \
+    third_party/pdfium/third_party/skia_shared \
+    third_party/perfetto \
+%if !%{with system_ply}
+    third_party/ply \
+%endif
+    third_party/polymer \
+    third_party/protobuf \
+    third_party/protobuf/third_party/six \
+    third_party/pyjson5 \
+    third_party/qcms \
+%if !%{with system_re2}
+    third_party/re2 \
+%endif
+    third_party/rnnoise \
+    third_party/s2cellid \
+    third_party/sfntly \
+    third_party/skia \
+    third_party/skia/include/third_party/vulkan \
+    third_party/skia/third_party/gif \
+    third_party/skia/third_party/skcms \
+    third_party/skia/third_party/vulkan \
+    third_party/smhasher \
+    third_party/speech-dispatcher \
+    third_party/spirv-headers \
+    third_party/SPIRV-Tools \
+    third_party/sqlite \
+    third_party/swiftshader \
+    third_party/swiftshader/third_party/llvm-subzero \
+    third_party/swiftshader/third_party/subzero \
+    third_party/tcmalloc \
+    third_party/usb_ids \
+    third_party/usrsctp \
+    third_party/vulkan \
+    third_party/web-animations-js \
+    third_party/webdriver \
+    third_party/webrtc \
+    third_party/webrtc/common_audio/third_party/fft4g \
+    third_party/webrtc/common_audio/third_party/spl_sqrt_floor \
+    third_party/webrtc/modules/third_party/fft \
+    third_party/webrtc/modules/third_party/g711 \
+    third_party/webrtc/modules/third_party/g722 \
+    third_party/webrtc/rtc_base/third_party/base64 \
+    third_party/webrtc/rtc_base/third_party/sigslot \
+    third_party/widevine \
+    third_party/woff2 \
+    third_party/xdg-utils \
+    third_party/yasm/run_yasm.py \
+    third_party/zlib/google \
+    tools/gn/base/third_party/icu \
+    url/third_party/mozilla \
+    v8/src/third_party/siphash \
+    v8/src/third_party/valgrind \
+    v8/src/third_party/utf8-decoder \
+    v8/third_party/inspector_protocol \
+    v8/third_party/v8
+    
+    
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
     flac \
     freetype \
@@ -241,8 +430,8 @@ find -type f -exec \
     re2 \
 %endif
     snappy \
-    yasm
-#    zlib
+    yasm \
+    zlib
 
 ./build/download_nacl_toolchains.py --packages \
     nacl_x86_glibc,nacl_x86_newlib,pnacl_newlib,pnacl_translator sync --extract
