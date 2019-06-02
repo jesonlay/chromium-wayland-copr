@@ -8,7 +8,7 @@
 # Get the version number of latest stable version
 # $ curl -s 'https://omahaproxy.appspot.com/all?os=linux&channel=stable' | sed 1d | cut -d , -f 3
 
-# Require harfbuzz >= 1.8.6 for hb_font_funcs_set_glyph_h_advances_func
+# Require harfbuzz >= 2.0.0 for hb_ot_tags_from_script_and_language
 %if 0%{?fedora} >= 30
 %bcond_without system_harfbuzz
 %else
@@ -46,7 +46,7 @@
 # Disabled by default because it causes out-of-memory error on Fedora Copr
 %bcond_with fedora_compilation_flags
 
-Name:       chromium-wayland
+Name:       chromium
 Version:    74.0.3729.169
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
@@ -68,7 +68,7 @@ Source0:    https://commondatastorage.googleapis.com/chromium-browser-official/c
 #
 # The repackaged source tarball used here is produced by:
 # ./chromium-latest.py --stable --ffmpegclean --ffmpegarm --deleteunrar
-
+#Source0:    chromium-%{version}-clean.tar.xz
 Source1:    chromium-latest.py
 Source2:    chromium-ffmpeg-clean.sh
 Source3:    chromium-ffmpeg-free-sources.py
@@ -76,18 +76,17 @@ Source3:    chromium-ffmpeg-free-sources.py
 # The following two source files are copied and modified from
 # https://repos.fedorapeople.org/repos/spot/chromium/
 Source10:   chromium-browser.sh
-Source11:   chromium-wayland.desktop
+Source11:   chromium-browser.desktop
 
 # The following two source files are copied verbatim from
 # https://src.fedoraproject.org/cgit/rpms/chromium.git/tree/
-Source12:   chromium-wayland.xml
-Source13:   chromium-wayland.appdata.xml
+Source12:   chromium-browser.xml
 
 # Disable non-free unrar
-# Patch20:    chromium-disable-unrar.patch
+Patch20:    chromium-disable-unrar.patch
 
 # Fix llvm-ar command usage
-# Patch50:    chromium-nacl-llvm-ar.patch
+Patch50:    chromium-nacl-llvm-ar.patch
 
 # Don't use unversioned python commands. This patch is based on
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
@@ -110,22 +109,7 @@ Patch80:    chromium-webrtc-cstring.patch
 # https://crbug.com/gn/77
 Patch90:    chromium-gn-revert-bug-77.patch
 
-
-
-#Patch101: 	ozone-01-gbm_wrapper.patch
-#Patch102: 	ozone-02-software-render.patch
-#Patch103: 	ozone-03-V4L2VDA.patch
-#Patch104: 	ozone-04-mmap-libv4l.patch
-#Patch105: 	ozone-05-remove-decorations.patch
-#Patch106: 	ozone-06-popup-window-x11.patch
-#Patch107: 	ozone-07-tabdrag.patch
-#Patch108: 	ozone-08-fakeinputmethodcontextfactory.patch
-#Patch109: 	ozone-09-tabdragx11.patch
-#Patch110: 	ozone-10-move-resize.patch
-#Patch111: 	ozone-11-tests-filter.patch
-#Patch112: 	ozone-12-vaapi-build.patch
-
-
+# I don't have time to test whether it work on other architectures
 ExclusiveArch: x86_64
 
 # Chromium 54 requires clang to enable nacl support
@@ -142,7 +126,7 @@ BuildRequires: minizip-compat-devel
 %else
 BuildRequires: minizip-devel
 %endif
-BuildRequires: mesa-libGL-devel, mesa-libEGL-devel, libgbm-devel
+BuildRequires: mesa-libGL-devel, mesa-libEGL-devel
 BuildRequires: pkgconfig(gtk+-2.0), pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(libexif), pkgconfig(nss)
 BuildRequires: pkgconfig(xtst), pkgconfig(xscrnsaver)
@@ -183,10 +167,11 @@ BuildRequires: re2-devel
 BuildRequires: snappy-devel
 BuildRequires: yasm
 BuildRequires: zlib-devel
-# use_*
+# *_use_*
 BuildRequires: pciutils-devel
 BuildRequires: speech-dispatcher-devel
 BuildRequires: pulseaudio-libs-devel
+BuildRequires: pkgconfig(libpipewire-0.2)
 # install desktop files
 BuildRequires: desktop-file-utils
 # install AppData files
@@ -195,9 +180,22 @@ Requires(post):   desktop-file-utils
 Requires(postun): desktop-file-utils
 Requires:         hicolor-icon-theme
 
+Obsoletes:     chromedriver <= %{version}-%{release}
+Obsoletes:     chromium-common <= %{version}-%{release}
+Obsoletes:     chromium-headless <= %{version}-%{release}
+Obsoletes:     chromium-libs <= %{version}-%{release}
+Obsoletes:     chromium-libs-media <= %{version}-%{release}
+Provides:      chromedriver = %{version}-%{release}
+Provides:      chromium-common = %{version}-%{release}
+Provides:      chromium-headless = %{version}-%{release}
+Provides:      chromium-libs = %{version}-%{release}
+Provides:      chromium-libs-media = %{version}-%{release}
 
+Provides:      chromedriver-stable = %{version}-%{release}
+Conflicts:     chromedriver-testing
+Conflicts:     chromedriver-unstable
 
-%global chromiumdir %{_libdir}/%{name}
+%global chromiumdir %{_libdir}/chromium-browser
 %global __provides_exclude_from ^%{chromiumdir}/.*$
 
 %if !%{with symbol}
@@ -208,7 +206,7 @@ Requires:         hicolor-icon-theme
 
 
 %prep
-%autosetup -n chromium-%{version} -p1
+%autosetup -p1
 
 # Don't use unversioned python commands in shebangs. This command is based on
 # https://src.fedoraproject.org/rpms/chromium/c/cdad6219176a7615
@@ -402,8 +400,7 @@ find -type f -exec \
     v8/src/third_party/utf8-decoder \
     v8/third_party/inspector_protocol \
     v8/third_party/v8
-    
-    
+
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
     flac \
     freetype \
@@ -441,6 +438,14 @@ sed -i 's|//third_party/usb_ids|/usr/share/hwdata|g' device/usb/BUILD.gn
 # Don't use static libstdc++
 sed -i '/-static-libstdc++/d' tools/gn/build/gen.py
 
+rmdir third_party/markupsafe
+ln -s %{python2_sitearch}/markupsafe third_party/markupsafe
+
+%if %{with system_ply}
+rmdir third_party/ply
+ln -s %{python2_sitelib}/ply third_party/ply
+%endif
+
 mkdir -p third_party/node/linux/node-linux-x64/bin
 ln -s %{_bindir}/node third_party/node/linux/node-linux-x64/bin/node
 
@@ -471,23 +476,24 @@ gn_args=(
     use_sysroot=false
     use_custom_libcxx=false
     use_aura=true
+    use_cups=true
+    use_gnome_keyring=true
+    use_gio=true
+    use_jumbo_build=true
+    use_kerberos=true
+    use_libpci=true
+    use_pulseaudio=true
+    use_system_freetype=true
     use_xkbcommon=true
     use_ozone=true
     use_system_libdrm=true
     ozone_platform_wayland=true
     use_system_minigbm=true
-    use_cups=true
-    remove_webcore_debug_symbols=true
-    use_gnome_keyring=true
-    use_jumbo_build=true
-    use_gio=true
-    use_kerberos=true
-    use_libpci=true
-    use_pulseaudio=true
-    use_system_freetype=true
 %if %{with system_harfbuzz}
     use_system_harfbuzz=true
 %endif
+    rtc_use_pipewire=true
+    rtc_link_pipewire=true
     enable_hangout_services_extension=false
     enable_nacl=false
     fatal_linker_warnings=false
@@ -526,53 +532,61 @@ gn_args+=(
 ./out/Release/gn gen out/Release \
     --script-executable=/usr/bin/python2 --args="${gn_args[*]}"
 
-
-ninja -j2 -C out/Release chrome chrome_sandbox chromedriver
-
-
+%if 0%{?ninja_build:1}
+%{ninja_build} -C out/Release chrome chrome_sandbox chromedriver
+%else
+ninja -v %{_smp_mflags} -C out/Release chrome chrome_sandbox chromedriver
+%endif
 
 %install
-ls out/Release/
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{chromiumdir}/locales
+mkdir -p %{buildroot}%{chromiumdir}/MEIPreload
 mkdir -p %{buildroot}%{chromiumdir}/swiftshader
 mkdir -p %{buildroot}%{_mandir}/man1
-mkdir -p %{buildroot}%{_datadir}/appdata
 mkdir -p %{buildroot}%{_datadir}/applications
 mkdir -p %{buildroot}%{_datadir}/gnome-control-center/default-apps
+mkdir -p %{buildroot}%{_datadir}/metainfo
 sed -e "s|@@CHROMIUMDIR@@|%{chromiumdir}|" -e "s|@@BUILDTARGET@@|`cat /etc/redhat-release`|" \
     %{SOURCE10} > chromium-browser.sh
-install -m 755 chromium-browser.sh %{buildroot}%{_bindir}/%{name}
+install -m 755 chromium-browser.sh %{buildroot}%{_bindir}/chromium-browser
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE11}
 install -m 644 %{SOURCE12} %{buildroot}%{_datadir}/gnome-control-center/default-apps/
-appstream-util validate-relax --nonet %{SOURCE13}
-install -m 644 %{SOURCE13} %{buildroot}%{_datadir}/appdata/
+install -m 644 chrome/installer/linux/common/chromium-browser/chromium-browser.appdata.xml \
+    %{buildroot}%{_datadir}/metainfo/
+appstream-util validate-relax --nonet \
+    %{buildroot}%{_datadir}/metainfo/chromium-browser.appdata.xml
 sed -e "s|@@MENUNAME@@|Chromium|g" -e "s|@@PACKAGE@@|chromium|g" \
     chrome/app/resources/manpage.1.in > chrome.1
-install -m 644 chrome.1 %{buildroot}%{_mandir}/man1/chromium-wayland.1
+install -m 644 chrome.1 %{buildroot}%{_mandir}/man1/chromium-browser.1
 install -m 755 out/Release/chrome %{buildroot}%{chromiumdir}/chromium-browser
 install -m 4755 out/Release/chrome_sandbox %{buildroot}%{chromiumdir}/chrome-sandbox
 install -m 755 out/Release/chromedriver %{buildroot}%{chromiumdir}/
 %if !%{with system_libicu}
 install -m 644 out/Release/icudtl.dat %{buildroot}%{chromiumdir}/
 %endif
+install -m 755 out/Release/nacl_helper %{buildroot}%{chromiumdir}/
+install -m 755 out/Release/nacl_helper_bootstrap %{buildroot}%{chromiumdir}/
+install -m 644 out/Release/nacl_irt_x86_64.nexe %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/natives_blob.bin %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/v8_context_snapshot.bin %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/*.pak %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/locales/*.pak %{buildroot}%{chromiumdir}/locales/
+install -m 644 out/Release/MEIPreload/* %{buildroot}%{chromiumdir}/MEIPreload/
 install -m 755 out/Release/swiftshader/*.so %{buildroot}%{chromiumdir}/swiftshader/
 for i in 16 32; do
     mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps
     install -m 644 chrome/app/theme/default_100_percent/chromium/product_logo_$i.png \
-        %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-wayland.png
+        %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-browser.png
 done
 for i in 22 24 32 48 64 128 256; do
     if [ ${i} = 32 ]; then ext=xpm; else ext=png; fi
     if [ ${i} = 32 ]; then dir=linux/; else dir=; fi
     mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps
     install -m 644 chrome/app/theme/chromium/${dir}product_logo_$i.${ext} \
-        %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-wayland.${ext}
+        %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-browser.${ext}
 done
+
 
 %post
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
@@ -592,20 +606,20 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %files
 %license LICENSE
 %doc AUTHORS README.md
-%{_bindir}/chromium-wayland
-%{_datadir}/appdata/chromium-wayland.appdata.xml
-%{_datadir}/applications/chromium-wayland.desktop
-%{_datadir}/gnome-control-center/default-apps/chromium-wayland.xml
-%{_datadir}/icons/hicolor/16x16/apps/chromium-wayland.png
-%{_datadir}/icons/hicolor/22x22/apps/chromium-wayland.png
-%{_datadir}/icons/hicolor/24x24/apps/chromium-wayland.png
-%{_datadir}/icons/hicolor/32x32/apps/chromium-wayland.png
-%{_datadir}/icons/hicolor/32x32/apps/chromium-wayland.xpm
-%{_datadir}/icons/hicolor/48x48/apps/chromium-wayland.png
-%{_datadir}/icons/hicolor/64x64/apps/chromium-wayland.png
-%{_datadir}/icons/hicolor/128x128/apps/chromium-wayland.png
-%{_datadir}/icons/hicolor/256x256/apps/chromium-wayland.png
-%{_mandir}/man1/chromium-wayland.1
+%{_bindir}/chromium-browser
+%{_datadir}/applications/chromium-browser.desktop
+%{_datadir}/gnome-control-center/default-apps/chromium-browser.xml
+%{_datadir}/icons/hicolor/16x16/apps/chromium-browser.png
+%{_datadir}/icons/hicolor/22x22/apps/chromium-browser.png
+%{_datadir}/icons/hicolor/24x24/apps/chromium-browser.png
+%{_datadir}/icons/hicolor/32x32/apps/chromium-browser.png
+%{_datadir}/icons/hicolor/32x32/apps/chromium-browser.xpm
+%{_datadir}/icons/hicolor/48x48/apps/chromium-browser.png
+%{_datadir}/icons/hicolor/64x64/apps/chromium-browser.png
+%{_datadir}/icons/hicolor/128x128/apps/chromium-browser.png
+%{_datadir}/icons/hicolor/256x256/apps/chromium-browser.png
+%{_datadir}/metainfo/chromium-browser.appdata.xml
+%{_mandir}/man1/chromium-browser.1.gz
 %dir %{chromiumdir}
 %{chromiumdir}/chromium-browser
 %{chromiumdir}/chrome-sandbox
@@ -613,11 +627,17 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %if !%{with system_libicu}
 %{chromiumdir}/icudtl.dat
 %endif
+%{chromiumdir}/nacl_helper
+%{chromiumdir}/nacl_helper_bootstrap
+%{chromiumdir}/nacl_irt_x86_64.nexe
 %{chromiumdir}/natives_blob.bin
 %{chromiumdir}/v8_context_snapshot.bin
 %{chromiumdir}/*.pak
 %dir %{chromiumdir}/locales
 %{chromiumdir}/locales/*.pak
+%dir %{chromiumdir}/MEIPreload
+%{chromiumdir}/MEIPreload/manifest.json
+%{chromiumdir}/MEIPreload/preloaded_data.pb
 %dir %{chromiumdir}/swiftshader
 %{chromiumdir}/swiftshader/libEGL.so
 %{chromiumdir}/swiftshader/libGLESv2.so
@@ -625,6 +645,56 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 %changelog
+* Wed May 22 2019 - Ting-Wei Lan <lantw44@gmail.com> - 74.0.3729.169-100
+- Update to 74.0.3729.169
+
+* Wed May 15 2019 - Ting-Wei Lan <lantw44@gmail.com> - 74.0.3729.157-100
+- Update to 74.0.3729.157
+
+* Wed May 01 2019 - Ting-Wei Lan <lantw44@gmail.com> - 74.0.3729.131-100
+- Update to 74.0.3729.131
+
+* Thu Apr 25 2019 - Ting-Wei Lan <lantw44@gmail.com> - 74.0.3729.108-100
+- Update to 74.0.3729.108
+
+* Sat Apr 06 2019 - Ting-Wei Lan <lantw44@gmail.com> - 73.0.3683.103-100
+- Update to 73.0.3683.103
+
+* Sat Mar 23 2019 - Ting-Wei Lan <lantw44@gmail.com> - 73.0.3683.86-101
+- Enable jumbo build
+- Install MEIPreload
+- Use upstream AppStream data file and move to metainfo
+
+* Thu Mar 21 2019 - Ting-Wei Lan <lantw44@gmail.com> - 73.0.3683.86-100
+- Update to 73.0.3683.86
+
+* Wed Mar 13 2019 - Ting-Wei Lan <lantw44@gmail.com> - 73.0.3683.75-100
+- Update to 73.0.3683.75
+
+* Sat Mar 02 2019 - Ting-Wei Lan <lantw44@gmail.com> - 72.0.3626.121-100
+- Update to 72.0.3626.121
+
+* Fri Feb 22 2019 - Ting-Wei Lan <lantw44@gmail.com> - 72.0.3626.119-100
+- Update to 72.0.3626.119
+
+* Thu Feb 14 2019 - Ting-Wei Lan <lantw44@gmail.com> - 72.0.3626.109-100
+- Update to 72.0.3626.109
+
+* Fri Feb 08 2019 - Ting-Wei Lan <lantw44@gmail.com> - 72.0.3626.96-100
+- Update to 72.0.3626.96
+
+* Sat Feb 02 2019 - Ting-Wei Lan <lantw44@gmail.com> - 72.0.3626.81-100
+- Update to 72.0.3626.81
+- Remove -fno-delete-null-pointer-checks because it causes nullptr checks in
+  constexpr to fail to compile.
+
+* Thu Dec 13 2018 - Ting-Wei Lan <lantw44@gmail.com> - 71.0.3578.98-100
+- Update to 71.0.3578.98
+
+* Mon Dec 10 2018 - Ting-Wei Lan <lantw44@gmail.com> - 71.0.3578.80-100
+- Update to 71.0.3578.80
+- Bundle re2 because the one included in Fedora is too old
+
 * Tue Nov 20 2018 - Ting-Wei Lan <lantw44@gmail.com> - 70.0.3538.110-100
 - Update to 70.0.3538.110
 
