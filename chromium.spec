@@ -241,8 +241,8 @@ find -type f -exec \
     re2 \
 %endif
     snappy \
-    yasm \
-    zlib
+    yasm
+#    zlib
 
 ./build/download_nacl_toolchains.py --packages \
     nacl_x86_glibc,nacl_x86_newlib,pnacl_newlib,pnacl_translator sync --extract
