@@ -4,8 +4,8 @@
   <web-browsers>
     <web-browser>
       <name>Chromium-wayland</name>
-      <executable>chromium-wayland</executable>
-      <command>/usr/bin/chromium-wayland %s</command>
+      <executable>chromium-browser</executable>
+      <command>/usr/bin/chromium-browser %s</command>
       <icon-name>chromium-browser</icon-name>
       <run-in-terminal>false</run-in-terminal>
       <netscape-remote>false</netscape-remote>
