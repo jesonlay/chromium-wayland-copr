@@ -46,6 +46,9 @@
 # Disabled by default because it causes out-of-memory error on Fedora Copr
 %bcond_with fedora_compilation_flags
 
+# try to build with ozone to support wayland desktop
+%bcond_with ozone
+
 Name:       chromium
 Version:    74.0.3729.169
 Release:    100%{?dist}
@@ -126,7 +129,10 @@ BuildRequires: minizip-compat-devel
 %else
 BuildRequires: minizip-devel
 %endif
-BuildRequires: mesa-libGL-devel, mesa-libEGL-devel, libgbm-devel
+BuildRequires: mesa-libGL-devel, mesa-libEGL-devel
+%if %{with ozone}
+BuildRequires: libgbm-devel
+%endif
 BuildRequires: pkgconfig(gtk+-2.0), pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(libexif), pkgconfig(nss)
 BuildRequires: pkgconfig(xtst), pkgconfig(xscrnsaver)
@@ -296,6 +302,10 @@ find -type f -exec \
     third_party/iccjpeg \
 %if !%{with system_libicu}
     third_party/icu \
+%endif
+%if %{with ozone}
+    third_party/wayland \
+    third_party/wayland-protocols \
 %endif
     third_party/inspector_protocol \
     third_party/jinja2 \
