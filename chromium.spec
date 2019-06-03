@@ -572,14 +572,14 @@ install -m 755 out/Release/chromedriver %{buildroot}%{chromiumdir}/
 %if !%{with system_libicu}
 install -m 644 out/Release/icudtl.dat %{buildroot}%{chromiumdir}/
 %endif
-install -m 755 out/Release/nacl_helper %{buildroot}%{chromiumdir}/
-install -m 755 out/Release/nacl_helper_bootstrap %{buildroot}%{chromiumdir}/
-install -m 644 out/Release/nacl_irt_x86_64.nexe %{buildroot}%{chromiumdir}/
+# install -m 755 out/Release/nacl_helper %{buildroot}%{chromiumdir}/
+# install -m 755 out/Release/nacl_helper_bootstrap %{buildroot}%{chromiumdir}/
+# install -m 644 out/Release/nacl_irt_x86_64.nexe %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/natives_blob.bin %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/v8_context_snapshot.bin %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/*.pak %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/locales/*.pak %{buildroot}%{chromiumdir}/locales/
-install -m 644 out/Release/MEIPreload/* %{buildroot}%{chromiumdir}/MEIPreload/
+# install -m 644 out/Release/MEIPreload/* %{buildroot}%{chromiumdir}/MEIPreload/
 install -m 755 out/Release/swiftshader/*.so %{buildroot}%{chromiumdir}/swiftshader/
 for i in 16 32; do
     mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps
@@ -634,17 +634,17 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %if !%{with system_libicu}
 %{chromiumdir}/icudtl.dat
 %endif
-%{chromiumdir}/nacl_helper
-%{chromiumdir}/nacl_helper_bootstrap
-%{chromiumdir}/nacl_irt_x86_64.nexe
+# %{chromiumdir}/nacl_helper
+# %{chromiumdir}/nacl_helper_bootstrap
+# %{chromiumdir}/nacl_irt_x86_64.nexe
 %{chromiumdir}/natives_blob.bin
 %{chromiumdir}/v8_context_snapshot.bin
 %{chromiumdir}/*.pak
 %dir %{chromiumdir}/locales
 %{chromiumdir}/locales/*.pak
-%dir %{chromiumdir}/MEIPreload
-%{chromiumdir}/MEIPreload/manifest.json
-%{chromiumdir}/MEIPreload/preloaded_data.pb
+# %dir %{chromiumdir}/MEIPreload
+# %{chromiumdir}/MEIPreload/manifest.json
+# %{chromiumdir}/MEIPreload/preloaded_data.pb
 %dir %{chromiumdir}/swiftshader
 %{chromiumdir}/swiftshader/libEGL.so
 %{chromiumdir}/swiftshader/libGLESv2.so
