@@ -130,9 +130,7 @@ BuildRequires: minizip-compat-devel
 BuildRequires: minizip-devel
 %endif
 BuildRequires: mesa-libGL-devel, mesa-libEGL-devel
-%if %{with ozone}
 BuildRequires: libgbm-devel
-%endif
 BuildRequires: pkgconfig(gtk+-2.0), pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(libexif), pkgconfig(nss)
 BuildRequires: pkgconfig(xtst), pkgconfig(xscrnsaver)
@@ -303,10 +301,8 @@ find -type f -exec \
 %if !%{with system_libicu}
     third_party/icu \
 %endif
-%if %{with ozone}
     third_party/wayland \
     third_party/wayland-protocols \
-%endif
     third_party/inspector_protocol \
     third_party/jinja2 \
     third_party/jsoncpp \
@@ -337,6 +333,7 @@ find -type f -exec \
     third_party/libyuv \
     third_party/lss \
     third_party/lzma_sdk \
+    third_party/minigbm \
     third_party/mesa \
     third_party/metrics_proto \
     third_party/modp_b64 \
