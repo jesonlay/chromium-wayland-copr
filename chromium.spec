@@ -126,7 +126,7 @@ BuildRequires: minizip-compat-devel
 %else
 BuildRequires: minizip-devel
 %endif
-BuildRequires: mesa-libGL-devel, mesa-libEGL-devel
+BuildRequires: mesa-libGL-devel, mesa-libEGL-devel, libgbm-devel
 BuildRequires: pkgconfig(gtk+-2.0), pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(libexif), pkgconfig(nss)
 BuildRequires: pkgconfig(xtst), pkgconfig(xscrnsaver)
