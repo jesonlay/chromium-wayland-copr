@@ -399,6 +399,7 @@ find -type f -exec \
     v8/src/third_party/valgrind \
     v8/src/third_party/utf8-decoder \
     v8/third_party/inspector_protocol \
+    third_party/usb_ids \
     v8/third_party/v8
 
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
@@ -433,7 +434,7 @@ find -type f -exec \
 ./build/download_nacl_toolchains.py --packages \
     nacl_x86_glibc,nacl_x86_newlib,pnacl_newlib,pnacl_translator sync --extract
 
-sed -i 's|//third_party/usb_ids|/usr/share/hwdata|g' device/usb/BUILD.gn
+# sed -i 's|//third_party/usb_ids|/usr/share/hwdata|g' device/usb/BUILD.gn
 
 # Don't use static libstdc++
 sed -i '/-static-libstdc++/d' tools/gn/build/gen.py
