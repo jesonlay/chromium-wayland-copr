@@ -279,7 +279,6 @@ find -type f -exec \
     third_party/dom_distiller_js \
     third_party/emoji-segmenter \
     third_party/ffmpeg \
-    third_party/fips181 \
     third_party/flatbuffers \
     third_party/flot \
     third_party/freetype \
@@ -336,7 +335,6 @@ find -type f -exec \
     third_party/node \
     third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2 \
     third_party/openh264 \
-    third_party/openmax_dl \
     third_party/ots \
     third_party/pdfium \
     third_party/pdfium/third_party/agg23 \
