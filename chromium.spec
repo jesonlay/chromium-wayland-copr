@@ -223,6 +223,7 @@ find -type f -exec \
     base/third_party/valgrind \
     base/third_party/xdg_mime \
     base/third_party/xdg_user_dirs \
+    base/third_party/cityhash \
     buildtools/third_party/libc++ \
     buildtools/third_party/libc++abi \
     chrome/third_party/mozilla_security_manager \
@@ -393,6 +394,9 @@ find -type f -exec \
     third_party/xdg-utils \
     third_party/yasm/run_yasm.py \
     third_party/zlib/google \
+    third_party/google_trust_services \
+    third_party/jacoco \
+    third_party/apache-mac \
     tools/gn/base/third_party/icu \
     url/third_party/mozilla \
     v8/src/third_party/siphash \
