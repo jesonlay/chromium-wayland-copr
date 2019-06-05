@@ -390,6 +390,7 @@ find -type f -exec \
     third_party/webrtc/modules/third_party/g722 \
     third_party/webrtc/rtc_base/third_party/base64 \
     third_party/webrtc/rtc_base/third_party/sigslot \
+    third_party/boringssl/linux-x86_64/crypto/third_party/sike \
     third_party/widevine \
     third_party/woff2 \
     third_party/xdg-utils \
