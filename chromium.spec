@@ -401,6 +401,7 @@ find -type f -exec \
     third_party/apache-mac \
     third_party/dawn \
     third_party/grpc \
+    third_party/openscreen \
     tools/gn/base/third_party/icu \
     url/third_party/mozilla \
     v8/src/third_party/siphash \
