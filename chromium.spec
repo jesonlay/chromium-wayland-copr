@@ -253,6 +253,7 @@ find -type f -exec \
     third_party/apple_apsl \
     third_party/boringssl \
     third_party/boringssl/src/third_party/fiat \
+    third_party/boringssl/src/third_party/sike \
     third_party/blink \
     third_party/breakpad \
     third_party/breakpad/breakpad/src/third_party/curl \
