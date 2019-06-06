@@ -224,7 +224,7 @@ rmdir third_party/markupsafe
 ln -s %{python2_sitearch}/markupsafe third_party/markupsafe
 
 %if %{with system_ply}
-rmdir third_party/ply
+rm -rf third_party/ply
 ln -s %{python2_sitelib}/ply third_party/ply
 %endif
 
