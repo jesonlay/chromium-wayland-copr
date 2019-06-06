@@ -220,7 +220,7 @@ find -type f -exec \
 # Don't use static libstdc++
 sed -i '/-static-libstdc++/d' tools/gn/build/gen.py
 
-rmdir third_party/markupsafe
+rm -rf third_party/markupsafe
 ln -s %{python2_sitearch}/markupsafe third_party/markupsafe
 
 %if %{with system_ply}
