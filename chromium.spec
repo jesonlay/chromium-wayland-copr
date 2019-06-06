@@ -393,7 +393,7 @@ find -type f -exec \
     third_party/tcmalloc \
     third_party/usb_ids \
     third_party/usrsctp \
-    third_party/unrar
+    third_party/unrar \
     third_party/vulkan \
     third_party/web-animations-js \
     third_party/webdriver \
