@@ -377,6 +377,7 @@ find -type f -exec \
     third_party/sfntly \
     third_party/skia \
     third_party/skia/include/third_party/vulkan \
+    third_party/skia/include/third_party/skcms \
     third_party/skia/third_party/gif \
     third_party/skia/third_party/skcms \
     third_party/skia/third_party/vulkan \
