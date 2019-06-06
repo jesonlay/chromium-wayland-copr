@@ -258,6 +258,9 @@ find -type f -exec \
     third_party/breakpad \
     third_party/breakpad/breakpad/src/third_party/curl \
     third_party/brotli \
+    third_party/bspatch \
+    third_party/byte_buddy \
+    third_party/cct_dynamic_module \
     third_party/cacheinvalidation \
     third_party/catapult \
     third_party/catapult/common/py_vulcanize/third_party/rcssmin \
@@ -270,12 +273,16 @@ find -type f -exec \
     third_party/catapult/tracing/third_party/oboe \
     third_party/catapult/tracing/third_party/pako \
     third_party/ced \
+    third_party/chaijs \
+    third_party/checkstyle \
+    third_party/chromevox \
     third_party/cld_3 \
     third_party/closure_compiler \
     third_party/crashpad \
     third_party/crashpad/crashpad/third_party/zlib \
     third_party/crc32c \
     third_party/cros_system_api \
+    third_party/feed \
     third_party/dav1d \
     third_party/devscripts \
     third_party/dom_distiller_js \
@@ -284,6 +291,7 @@ find -type f -exec \
     third_party/flatbuffers \
     third_party/flot \
     third_party/freetype \
+    third_party/gestures \
     third_party/glslang \
     third_party/google_input_tools \
     third_party/google_input_tools/third_party/closure_library \
@@ -330,6 +338,8 @@ find -type f -exec \
     third_party/lss \
     third_party/lzma_sdk \
     third_party/minigbm \
+    third_party/markdown \
+    third_party/material_design_icons \
     third_party/mesa \
     third_party/metrics_proto \
     third_party/modp_b64 \
@@ -338,6 +348,8 @@ find -type f -exec \
     third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2 \
     third_party/openh264 \
     third_party/ots \
+    third_party/openvr \
+    third_party/opus \
     third_party/pdfium \
     third_party/pdfium/third_party/agg23 \
     third_party/pdfium/third_party/base \
@@ -372,6 +384,8 @@ find -type f -exec \
     third_party/speech-dispatcher \
     third_party/spirv-headers \
     third_party/SPIRV-Tools \
+    third_party/speech-dispatcher \
+    third_party/simplejson \
     third_party/sqlite \
     third_party/swiftshader \
     third_party/swiftshader/third_party/llvm-subzero \
@@ -402,6 +416,7 @@ find -type f -exec \
     third_party/dawn \
     third_party/grpc \
     third_party/openscreen \
+    third_party/pffft \
     tools/gn/base/third_party/icu \
     url/third_party/mozilla \
     v8/src/third_party/siphash \
