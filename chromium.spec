@@ -236,6 +236,7 @@ find -type f -exec \
     net/third_party/uri_template \
     third_party/abseil-cpp \
     third_party/adobe \
+    third_party/axe-core \
     third_party/angle \
     third_party/angle/src/common/third_party/base \
     third_party/angle/src/common/third_party/smhasher \
