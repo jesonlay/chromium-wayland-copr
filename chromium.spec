@@ -94,7 +94,7 @@ Source12:   chromium-browser.xml
 # Don't use unversioned python commands. This patch is based on
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
-# Patch60:    chromium-python2.patch
+Patch60:    chromium-python2.patch
 
 # Pull upstream patches
 
