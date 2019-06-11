@@ -36,11 +36,11 @@
 
 # Allow compiling with clang
 # Disabled by default becaue gcc is the system compiler
-%bcond_with clang
+%bcond_without clang
 
 # Allow disabling unconditional build dependency on clang
 # Enabled by default because nacl always uses clang to compile some files
-%bcond_with require_clang
+%bcond_without require_clang
 
 # Allow using compilation flags set by Fedora RPM macros
 # Disabled by default because it causes out-of-memory error on Fedora Copr
