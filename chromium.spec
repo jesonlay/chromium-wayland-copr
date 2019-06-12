@@ -252,7 +252,7 @@ export CC=gcc CXX=g++
 %endif
 
 # GN needs gold to bootstrap
-export LDFLAGS="$LDFLAGS -fuse-ld=gold"
+# export LDFLAGS="$LDFLAGS -fuse-ld=gold"
 
 gn_args=(
     is_debug=false
