@@ -234,6 +234,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           base/third_party/valgrind \
           base/third_party/xdg_mime \
           base/third_party/xdg_user_dirs \
+          tools/gn/base/third_party/icu \
           buildtools/third_party/libc++ \
           buildtools/third_party/libc++abi \
           chrome/third_party/mozilla_security_manager \
@@ -398,6 +399,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           v8/third_party/inspector_protocol \
           v8/third_party/v8 \
           base/third_party/libevent \
+          third_party/usb_ids \
           third_party/adobe \
           third_party/speech-dispatcher \
           third_party/usb_ids \
