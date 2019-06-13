@@ -113,7 +113,7 @@ ExclusiveArch: x86_64
 # Chromium 54 requires clang to enable nacl support
 # Chromium 59 requires llvm-ar to enable nacl support
 %if %{with clang} || %{with require_clang}
-BuildRequires: clang, llvm
+BuildRequires: clang, llvm, lld
 %endif
 # Basic tools and libraries
 BuildRequires: ninja-build, nodejs, java-headless, bison, gperf, hwdata
@@ -168,6 +168,7 @@ BuildRequires: re2-devel
 BuildRequires: snappy-devel
 BuildRequires: yasm
 BuildRequires: zlib-devel
+BuildRequires: vulkan-loader
 # *_use_*
 BuildRequires: pciutils-devel
 BuildRequires: speech-dispatcher-devel
