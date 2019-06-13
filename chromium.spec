@@ -220,7 +220,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     -i third_party/dom_distiller_js/protoc_plugins/json_values_converter.py \
     -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
     -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
-    -i third_party/ffmpeg/chromium/scripts/generate_gn.py 
+    -i third_party/ffmpeg/chromium/scripts/generate_gn.py \
+    -i tools/gn/bootstrap/bootstrap.py
     
 ./build/linux/unbundle/remove_bundled_libraries.py --do-remove \
           base/third_party/dmg_fp \
