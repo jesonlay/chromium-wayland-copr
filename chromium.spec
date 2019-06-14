@@ -303,7 +303,13 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/google_input_tools/third_party/closure_library/third_party/closure \
           third_party/googletest \
           third_party/hunspell \
+%if !%{with system_harfbuzz}
+          third_party/harfbuzz-ng \
+%endif
           third_party/iccjpeg \
+%if !%{with system_libicu}
+          third_party/icu \
+%endif
           third_party/inspector_protocol \
           third_party/jinja2 \
           third_party/jsoncpp \
@@ -321,11 +327,17 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/libsrtp \
           third_party/libsync \
           third_party/libudev \
+%if !%{with system_libvpx}
           third_party/libvpx \
           third_party/libvpx/source/libvpx/third_party/x86inc \
+%endif
           third_party/libwebm \
           third_party/libwebp \
+%if %{with system_libxml2}
           third_party/libxml/chromium \
+%else
+          third_party/libxml \
+%endif
           third_party/libyuv \
           third_party/llvm \
           third_party/lss \
@@ -351,12 +363,17 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/pdfium/third_party/skia_shared \
           third_party/perfetto \
           third_party/pffft \
+%if !%{with system_ply}
           third_party/ply \
+%endif
           third_party/polymer \
           third_party/protobuf \
           third_party/protobuf/third_party/six \
           third_party/pyjson5 \
           third_party/qcms \
+%if !%{with system_re2}
+          third_party/re2 \
+%endif
           third_party/rnnoise \
           third_party/s2cellid \
           third_party/sfntly \
