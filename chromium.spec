@@ -240,12 +240,15 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           chrome/third_party/mozilla_security_manager \
           courgette/third_party \
           native_client/src/third_party/dlmalloc \
+          native_client/src/third_party/valgrind \
           native_client_sdk/src/libraries/third_party/newlib-extras \
           net/third_party/mozilla_security_manager \
           net/third_party/nss \
           net/third_party/quic \
           net/third_party/uri_template \
           third_party/abseil-cpp \
+          third_party/adobe \
+          third_party/axe-core \
           third_party/angle \
           third_party/angle/src/common/third_party/base \
           third_party/angle/src/common/third_party/smhasher \
@@ -297,6 +300,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/ffmpeg \
           third_party/flatbuffers \
           third_party/flot \
+          third_party/freetype \
+          third_party/gestures \
           third_party/glslang \
           third_party/google_input_tools \
           third_party/google_input_tools/third_party/closure_library \
@@ -311,6 +316,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/icu \
 %endif
           third_party/inspector_protocol \
+          third_party/wayland \
+          third_party/wayland-protocols \
           third_party/jinja2 \
           third_party/jsoncpp \
           third_party/jstemplate \
@@ -343,6 +350,9 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/lss \
           third_party/lzma_sdk \
           third_party/markupsafe \
+          third_party/minigbm \
+          third_party/markdown \
+          third_party/material_design_icons \
           third_party/mesa \
           third_party/metrics_proto \
           third_party/modp_b64 \
@@ -351,6 +361,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2 \
           third_party/openscreen \
           third_party/ots \
+          third_party/openvr \
+          third_party/opus \
           third_party/pdfium \
           third_party/pdfium/third_party/agg23 \
           third_party/pdfium/third_party/base \
@@ -385,6 +397,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/skia/third_party/skcms \
           third_party/skia/third_party/vulkan \
           third_party/smhasher \
+          third_party/speech-dispatcher \
           third_party/spirv-headers \
           third_party/SPIRV-Tools \
           third_party/sqlite \
@@ -395,6 +408,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/tcmalloc \
           third_party/unrar \
           third_party/usrsctp \
+          third_party/usb_ids \
           third_party/vulkan \
           third_party/web-animations-js \
           third_party/webdriver \
