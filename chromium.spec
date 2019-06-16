@@ -32,7 +32,7 @@
 
 # Allow building with symbols to ease debugging
 # Enabled by default because Fedora Copr has enough memory
-%bcond_without symbol
+%bcond_with symbol
 
 # Allow compiling with clang
 # Disabled by default becaue gcc is the system compiler
@@ -604,10 +604,13 @@ install -m 755 out/Release/chromedriver %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/icudtl.dat %{buildroot}%{chromiumdir}/
 %endif
 install -m 644 out/Release/natives_blob.bin %{buildroot}%{chromiumdir}/
+install -m 644 out/Release/snapshot_blob.bin %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/v8_context_snapshot.bin %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/*.pak %{buildroot}%{chromiumdir}/
 install -m 644 out/Release/locales/*.pak %{buildroot}%{chromiumdir}/locales/
 install -m 755 out/Release/swiftshader/*.so %{buildroot}%{chromiumdir}/swiftshader/
+install -m 644 out/Release/MEIPreload/manifest.json %{buildroot}%{chromiumdir}/MEIPreload/
+install -m 644 out/Release/MEIPreload/preloaded_data.pb %{buildroot}%{chromiumdir}/MEIPreload/
 for i in 16 32; do
     mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps
     install -m 644 chrome/app/theme/default_100_percent/chromium/product_logo_$i.png \
@@ -663,13 +666,15 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %endif
 %{chromiumdir}/natives_blob.bin
 %{chromiumdir}/v8_context_snapshot.bin
+%{chromiumdir}/snapshot_blob.bin
 %{chromiumdir}/*.pak
 %dir %{chromiumdir}/locales
 %{chromiumdir}/locales/*.pak
 %dir %{chromiumdir}/swiftshader
 %{chromiumdir}/swiftshader/libEGL.so
 %{chromiumdir}/swiftshader/libGLESv2.so
-
+%{chromiumdir}/MEIPreload/manifest.json
+%{chromiumdir}/MEIPreload/preloaded_data.pb
 
 
 %changelog
