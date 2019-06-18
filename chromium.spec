@@ -136,6 +136,8 @@ BuildRequires: pkgconfig(xtst), pkgconfig(xscrnsaver)
 BuildRequires: pkgconfig(dbus-1), pkgconfig(libudev)
 BuildRequires: pkgconfig(gnome-keyring-1)
 BuildRequires: pkgconfig(libffi)
+#for vaapi
+BuildRequires:  pkgconfig(libva)
 # remove_bundled_libraries.py --do-remove
 BuildRequires: python2-rpm-macros
 BuildRequires: python2-beautifulsoup4
