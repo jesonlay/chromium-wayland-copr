@@ -30,6 +30,9 @@
 # Allow testing whether libvpx can be unbundled
 %bcond_with system_libvpx
 
+# Allow testing whether ffmpeg can be unbundled
+%bcond_with system_ffmpeg
+
 # Allow building with symbols to ease debugging
 # Enabled by default because Fedora Copr has enough memory
 %bcond_with symbol
@@ -95,7 +98,8 @@ Source12:   chromium-browser.xml
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
 Patch60:    chromium-python2.patch
-
+Patch61:    chromium-widevine-r4.patch
+Patch62:    enable-vaapi.patch
 # Pull upstream patches
 
 
@@ -157,6 +161,9 @@ BuildRequires: libpng-devel
 # Chromium requires libvpx 1.5.0 and some non-default options
 %if %{with system_libvpx}
 BuildRequires: libvpx-devel
+%endif
+%if %{with system_ffmpeg}
+BuildRequires: ffmpeg-devel
 %endif
 BuildRequires: libwebp-devel
 %if %{with system_libxml2}
@@ -297,7 +304,9 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/dawn \
           third_party/dom_distiller_js \
           third_party/emoji-segmenter \
+%if !%{with system_ffmpeg}
           third_party/ffmpeg \
+%endif
           third_party/flatbuffers \
           third_party/flot \
           third_party/freetype \
@@ -438,6 +447,9 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/yasm/run_yasm.py 
           
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
+%if %{with system_ffmpeg}
+    ffmpeg \
+%endif
     flac \
     freetype \
     fontconfig \
@@ -522,14 +534,18 @@ gn_args=(
     use_libpci=true
     use_pulseaudio=true
     use_system_freetype=true
+    use_vaapi=true
     use_xkbcommon=true
     use_ozone=true
     use_system_libdrm=true
     ozone_platform_wayland=true
     use_system_minigbm=true
+    enable_widevine=true
 %if %{with system_harfbuzz}
     use_system_harfbuzz=true
 %endif
+    ffmpeg_branding="Chrome"
+    proprietary_codecs=true
     rtc_use_pipewire=true
     rtc_link_pipewire=true
     enable_hangout_services_extension=false
