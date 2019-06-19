@@ -40,7 +40,7 @@ Index: dev/chrome/browser/about_flags.cc
 ===================================================================
 --- dev.orig/chrome/browser/about_flags.cc
 +++ dev/chrome/browser/about_flags.cc
-@@ -1443,7 +1443,7 @@ const FeatureEntry kFeatureEntries[] = {
+@@ -1438,7 +1438,7 @@ const FeatureEntry kFeatureEntries[] = {
          "disable-accelerated-video-decode",
          flag_descriptions::kAcceleratedVideoDecodeName,
          flag_descriptions::kAcceleratedVideoDecodeDescription,
@@ -49,7 +49,7 @@ Index: dev/chrome/browser/about_flags.cc
          SINGLE_DISABLE_VALUE_TYPE(switches::kDisableAcceleratedVideoDecode),
      },
  #if defined(OS_WIN)
-@@ -2000,10 +2000,10 @@ const FeatureEntry kFeatureEntries[] = {
+@@ -1871,10 +1871,10 @@ const FeatureEntry kFeatureEntries[] = {
       FEATURE_VALUE_TYPE(service_manager::features::kXRSandbox)},
  #endif  // ENABLE_ISOLATED_XR_SERVICE
  #endif  // ENABLE_VR
@@ -66,7 +66,7 @@ Index: dev/chrome/browser/flag_descriptions.cc
 ===================================================================
 --- dev.orig/chrome/browser/flag_descriptions.cc
 +++ dev/chrome/browser/flag_descriptions.cc
-@@ -2972,9 +2972,7 @@ const char kMacViewsTaskManagerDescripti
+@@ -2755,9 +2755,7 @@ const char kMacViewsTaskManagerDescripti
  
  #endif
  
@@ -77,7 +77,7 @@ Index: dev/chrome/browser/flag_descriptions.cc
  
  const char kAcceleratedMjpegDecodeName[] =
      "Hardware-accelerated mjpeg decode for captured frame";
-@@ -2982,6 +2980,12 @@ const char kAcceleratedMjpegDecodeDescri
+@@ -2765,6 +2763,12 @@ const char kAcceleratedMjpegDecodeDescri
      "Enable hardware-accelerated mjpeg decode for captured frame where "
      "available.";
  
@@ -94,7 +94,7 @@ Index: dev/chrome/browser/flag_descriptions.h
 ===================================================================
 --- dev.orig/chrome/browser/flag_descriptions.h
 +++ dev/chrome/browser/flag_descriptions.h
-@@ -1755,13 +1755,17 @@ extern const char kPermissionPromptPersi
+@@ -1638,13 +1638,17 @@ extern const char kPermissionPromptPersi
  
  #endif  // defined(OS_MACOSX)
  
@@ -127,7 +127,7 @@ Index: dev/content/gpu/BUILD.gn
  import("//ui/ozone/ozone.gni")
  
  # See //content/BUILD.gn for how this works.
-@@ -136,4 +137,8 @@ target(link_target_type, "gpu_sources")
+@@ -127,4 +127,8 @@ target(link_target_type, "gpu_sources")
        (!is_chromecast || is_cast_desktop_build)) {
      configs += [ "//build/config/linux/dri" ]
    }
@@ -140,7 +140,7 @@ Index: dev/gpu/config/software_rendering_list.json
 ===================================================================
 --- dev.orig/gpu/config/software_rendering_list.json
 +++ dev/gpu/config/software_rendering_list.json
-@@ -370,17 +370,6 @@
+@@ -380,17 +380,6 @@
        ]
      },
      {
@@ -162,7 +162,7 @@ Index: dev/media/base/media_switches.cc
 ===================================================================
 --- dev.orig/media/base/media_switches.cc
 +++ dev/media/base/media_switches.cc
-@@ -506,7 +506,7 @@ bool IsVideoCaptureAcceleratedJpegDecodi
+@@ -519,7 +519,7 @@ bool IsVideoCaptureAcceleratedJpegDecodi
            switches::kUseFakeJpegDecodeAccelerator)) {
      return true;
    }
@@ -183,7 +183,7 @@ Index: dev/media/filters/BUILD.gn
  
  jumbo_source_set("filters") {
    # Do not expand the visibility here without double-checking with OWNERS, this
-@@ -212,7 +213,7 @@ jumbo_source_set("filters") {
+@@ -199,7 +200,7 @@ jumbo_source_set("filters") {
      deps += [ "//media/base/android" ]
    }
  
@@ -192,18 +192,6 @@ Index: dev/media/filters/BUILD.gn
      sources += [
        "h264_bitstream_buffer.cc",
        "h264_bitstream_buffer.h",
-Index: dev/media/gpu/BUILD.gn
-===================================================================
---- dev.orig/media/gpu/BUILD.gn
-+++ dev/media/gpu/BUILD.gn
-@@ -577,6 +577,7 @@ if (is_chromeos || is_linux) {
-     if (use_ozone) {
-       deps += [ "//ui/ozone" ]
-     }
-+    public_configs = [ "//build/config/linux/libva" ]
-   }
- }
- 
 Index: dev/media/gpu/gpu_video_decode_accelerator_factory.cc
 ===================================================================
 --- dev.orig/media/gpu/gpu_video_decode_accelerator_factory.cc
@@ -245,82 +233,11 @@ Index: dev/media/gpu/ipc/service/gpu_video_decode_accelerator.cc
  
    // Attempt to set up performing decoding tasks on IO thread, if supported by
    // the VDA.
-Index: dev/media/gpu/vaapi/vaapi_video_decode_accelerator.cc
-===================================================================
---- dev.orig/media/gpu/vaapi/vaapi_video_decode_accelerator.cc
-+++ dev/media/gpu/vaapi/vaapi_video_decode_accelerator.cc
-@@ -74,6 +74,7 @@ void CloseGpuMemoryBufferHandle(const gf
- }
- #endif
- 
-+#if defined(OS_ANDROID) || defined(OS_CHROMEOS)
- // Returns true if the CPU is an Intel Gemini Lake or later (including Kaby
- // Lake) Cpu platform id's are referenced from the following file in kernel
- // source arch/x86/include/asm/intel-family.h
-@@ -103,6 +104,7 @@ bool IsSkyLakeOrLater() {
-                                      cpuid.model() >= kFirstSkyLakeModelId;
-   return is_sky_lake_or_later;
- }
-+#endif
- 
- }  // namespace
- 
-@@ -652,6 +654,10 @@ void VaapiVideoDecodeAccelerator::Assign
-   const unsigned int va_format = GetVaFormatForVideoCodecProfile(profile_);
-   std::vector<VASurfaceID> va_surface_ids;
- 
-+  // Nvidia doesn't support VAProfileNone, so don't try to create a temporary
-+  // copy buffer there. It's not needed anyways for hardware video decoding
-+  // to work.
-+#if defined(OS_ANDROID) || defined(OS_CHROMEOS)
-   // If we aren't in BufferAllocationMode::kNone, we have to allocate a
-   // |vpp_vaapi_wrapper_| for VaapiPicture to DownloadFromSurface() the VA's
-   // internal decoded frame.
-@@ -665,6 +671,7 @@ void VaapiVideoDecodeAccelerator::Assign
-       NotifyError(PLATFORM_FAILURE);
-     }
-   }
-+#endif
- 
-   for (size_t i = 0; i < buffers.size(); ++i) {
-     DCHECK(requested_pic_size_ == buffers[i].size());
-@@ -673,9 +680,13 @@ void VaapiVideoDecodeAccelerator::Assign
-     // only used as a copy destination. Therefore, the VaapiWrapper used and
-     // owned by |picture| is |vpp_vaapi_wrapper_|.
-     std::unique_ptr<VaapiPicture> picture = vaapi_picture_factory_->Create(
-+#if defined(OS_LINUX) && !defined(OS_ANDROID) && !defined(OS_CHROMEOS)
-+            vaapi_wrapper_,
-+#else
-         (buffer_allocation_mode_ == BufferAllocationMode::kNone)
-             ? vaapi_wrapper_
-             : vpp_vaapi_wrapper_,
-+#endif
-         make_context_current_cb_, bind_image_cb_, buffers[i]);
-     RETURN_AND_NOTIFY_ON_FAILURE(picture, "Failed creating a VaapiPicture",
-                                  PLATFORM_FAILURE, );
-@@ -1091,6 +1102,9 @@ VaapiVideoDecodeAccelerator::GetSupporte
- 
- VaapiVideoDecodeAccelerator::BufferAllocationMode
- VaapiVideoDecodeAccelerator::DecideBufferAllocationMode() {
-+#if defined(OS_LINUX) && !defined(OS_ANDROID) && !defined(OS_CHROMEOS)
-+  return BufferAllocationMode::kNormal;
-+#else
-   // TODO(crbug.com/912295): Enable a better BufferAllocationMode for IMPORT
-   // |output_mode_| as well.
-   if (output_mode_ == VideoDecodeAccelerator::Config::OutputMode::IMPORT)
-@@ -1123,6 +1137,7 @@ VaapiVideoDecodeAccelerator::DecideBuffe
-     return BufferAllocationMode::kReduced;
-
-   return BufferAllocationMode::kSuperReduced;
-+#endif
- }
- 
- bool VaapiVideoDecodeAccelerator::IsBufferAllocationModeReducedOrSuperReduced()
 Index: dev/media/gpu/vaapi/vaapi_wrapper.cc
 ===================================================================
 --- dev.orig/media/gpu/vaapi/vaapi_wrapper.cc
 +++ dev/media/gpu/vaapi/vaapi_wrapper.cc
-@@ -252,6 +252,11 @@ void VADisplayState::PreSandboxInitializ
+@@ -250,6 +250,11 @@ void VADisplayState::PreSandboxInitializ
        base::File::FLAG_OPEN | base::File::FLAG_READ | base::File::FLAG_WRITE);
    if (drm_file.IsValid())
      VADisplayState::Get()->SetDrmFd(drm_file.GetPlatformFile());
@@ -332,7 +249,7 @@ Index: dev/media/gpu/vaapi/vaapi_wrapper.cc
  }
  
  VADisplayState::VADisplayState()
-@@ -279,9 +284,6 @@ bool VADisplayState::Initialize() {
+@@ -277,9 +282,6 @@ bool VADisplayState::Initialize() {
  }
  
  bool VADisplayState::InitializeOnce() {
@@ -342,7 +259,7 @@ Index: dev/media/gpu/vaapi/vaapi_wrapper.cc
    switch (gl::GetGLImplementation()) {
      case gl::kGLImplementationEGLGLES2:
        va_display_ = vaGetDisplayDRM(drm_fd_.get());
-@@ -289,10 +291,10 @@ bool VADisplayState::InitializeOnce() {
+@@ -287,10 +289,10 @@ bool VADisplayState::InitializeOnce() {
      case gl::kGLImplementationDesktopGL:
  #if defined(USE_X11)
        va_display_ = vaGetDisplay(gfx::GetXDisplay());
@@ -356,7 +273,7 @@ Index: dev/media/gpu/vaapi/vaapi_wrapper.cc
        break;
      // Cannot infer platform from GL, try all available displays
      case gl::kGLImplementationNone:
-@@ -325,8 +327,19 @@ bool VADisplayState::InitializeOnce() {
+@@ -323,8 +325,19 @@ bool VADisplayState::InitializeOnce() {
    int major_version, minor_version;
    VAStatus va_res = vaInitialize(va_display_, &major_version, &minor_version);
    if (va_res != VA_STATUS_SUCCESS) {
@@ -378,7 +295,7 @@ Index: dev/media/gpu/vaapi/vaapi_wrapper.cc
    }
  
    va_initialized_ = true;
-@@ -334,7 +347,7 @@ bool VADisplayState::InitializeOnce() {
+@@ -332,7 +345,7 @@ bool VADisplayState::InitializeOnce() {
    va_vendor_string_ = vaQueryVendorString(va_display_);
    DLOG_IF(WARNING, va_vendor_string_.empty())
        << "Vendor string empty or error reading.";
@@ -387,7 +304,7 @@ Index: dev/media/gpu/vaapi/vaapi_wrapper.cc
             << va_vendor_string_;
  
    // The VAAPI version is determined from what is loaded on the system by
-@@ -638,7 +651,7 @@ bool VASupportedProfiles::AreAttribsSupp
+@@ -665,7 +678,7 @@ bool VASupportedProfiles::AreAttribsSupp
      if (attribs[i].type != required_attribs[i].type ||
          (attribs[i].value & required_attribs[i].value) !=
              required_attribs[i].value) {
