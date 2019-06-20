@@ -40,7 +40,7 @@ Index: dev/chrome/browser/about_flags.cc
 ===================================================================
 --- dev.orig/chrome/browser/about_flags.cc
 +++ dev/chrome/browser/about_flags.cc
-@@ -1438,6 +1438,6 @@ const FeatureEntry kFeatureEntries[] = {
+@@ -1438,7 +1438,7 @@ const FeatureEntry kFeatureEntries[] = {
          "disable-accelerated-video-decode",
          flag_descriptions::kAcceleratedVideoDecodeName,
          flag_descriptions::kAcceleratedVideoDecodeDescription,
@@ -48,7 +48,8 @@ Index: dev/chrome/browser/about_flags.cc
 +        kOsAll,
          SINGLE_DISABLE_VALUE_TYPE(switches::kDisableAcceleratedVideoDecode),
      },
-@@ -1871,9 +1871,9 @@ const FeatureEntry kFeatureEntries[] = {
+     {"enable-history-favicons-google-server-query",
+@@ -1871,10 +1871,10 @@ const FeatureEntry kFeatureEntries[] = {
       FEATURE_VALUE_TYPE(service_manager::features::kXRSandbox)},
  #endif  // ENABLE_ISOLATED_XR_SERVICE
  #endif  // ENABLE_VR
@@ -60,6 +61,7 @@ Index: dev/chrome/browser/about_flags.cc
 +     flag_descriptions::kAcceleratedMjpegDecodeDescription, kOsCrOS | kOsLinux,
       SINGLE_DISABLE_VALUE_TYPE(switches::kDisableAcceleratedMjpegDecode)},
  #endif  // OS_CHROMEOS
+     {"system-keyboard-lock", flag_descriptions::kSystemKeyboardLockName,
 Index: dev/chrome/browser/flag_descriptions.cc
 ===================================================================
 --- dev.orig/chrome/browser/flag_descriptions.cc
@@ -161,7 +163,7 @@ Index: dev/media/base/media_switches.cc
 --- dev.orig/media/base/media_switches.cc
 +++ dev/media/base/media_switches.cc
 @@ -523,7 +523,7 @@ bool IsVideoCaptureAcceleratedJpegDecodi
-           switches::kUseFakeMJpegDecodeAccelerator)) {
+           switches::kUseFakeMjpegDecodeAccelerator)) {
      return true;
    }
 -#if defined(OS_CHROMEOS)
