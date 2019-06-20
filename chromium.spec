@@ -546,7 +546,7 @@ gn_args=(
 %if %{with system_harfbuzz}
     use_system_harfbuzz=true
 %endif
-    ffmpeg_branding="Chrome"
+    'ffmpeg_branding="ChromeOS"'
     proprietary_codecs=true
     rtc_use_pipewire=true
     rtc_link_pipewire=true
