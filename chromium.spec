@@ -374,6 +374,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/ots \
           third_party/openvr \
           third_party/opus \
+          third_party/openh264 \
+          third_party/openmax_dl \
           third_party/pdfium \
           third_party/pdfium/third_party/agg23 \
           third_party/pdfium/third_party/base \
