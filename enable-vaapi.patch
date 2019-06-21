@@ -136,6 +136,25 @@ Index: dev/content/gpu/BUILD.gn
 +    public_configs = [ "//build/config/linux/libva" ]
 +  }
  }
+Index: a/media/gpu/vaapi/BUILD.gn
+===================================================================
+--- a/media/gpu/vaapi/BUILD.gn
++++ b/media/gpu/vaapi/BUILD.gn
+@@ -115,12 +115,12 @@ source_set("vaapi") {
+     ]
+   }
+ 
+-  if (ozone_platform_gbm || use_egl) {
++  if (ozone_platform_wayland || ozone_platform_gbm || use_egl) {
+     sources += [
+       "vaapi_picture_native_pixmap.cc",
+       "vaapi_picture_native_pixmap.h",
+     ]
+-    if (ozone_platform_gbm) {
++    if (ozone_platform_gbm || ozone_platform_wayland) {
+       sources += [
+         "vaapi_picture_native_pixmap_ozone.cc",
+         "vaapi_picture_native_pixmap_ozone.h",
 Index: dev/gpu/config/software_rendering_list.json
 ===================================================================
 --- dev.orig/gpu/config/software_rendering_list.json
