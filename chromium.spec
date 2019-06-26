@@ -181,7 +181,7 @@ BuildRequires: vulkan-loader
 # *_use_*
 BuildRequires: pciutils-devel
 BuildRequires: speech-dispatcher-devel
-uildRequires: pulseaudio-libs-devel
+BuildRequires: pulseaudio-libs-devel
 BuildRequires: pkgconfig(libpipewire-0.2)
 # install desktop files
 BuildRequires: desktop-file-utils
