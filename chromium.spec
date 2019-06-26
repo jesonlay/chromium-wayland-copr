@@ -101,7 +101,7 @@ Patch60:    chromium-python2.patch
 Patch61:    chromium-widevine-r4.patch
 Patch62:    enable-vaapi.patch
 # Pull upstream patches
-
+Patch63:    onpresent.patch
 
 # Pull patches from Fedora
 # https://src.fedoraproject.org/rpms/chromium/c/9071ee2d2f996b84
@@ -181,7 +181,7 @@ BuildRequires: vulkan-loader
 # *_use_*
 BuildRequires: pciutils-devel
 BuildRequires: speech-dispatcher-devel
-BuildRequires: pulseaudio-libs-devel
+uildRequires: pulseaudio-libs-devel
 BuildRequires: pkgconfig(libpipewire-0.2)
 # install desktop files
 BuildRequires: desktop-file-utils
