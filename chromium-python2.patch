@@ -1,6 +1,6 @@
 --- chromium-71.0.3578.80/tools/gn/bootstrap/bootstrap.py.orig	2018-12-06 01:06:19.815698655 +0800
 +++ chromium-71.0.3578.80/tools/gn/bootstrap/bootstrap.py	2018-12-06 01:07:32.262069775 +0800
-@@ -127,6 +127,7 @@
+@@ -129,6 +129,7 @@
        gn_gen_args += ' is_debug=false'
      subprocess.check_call([
          gn_path, 'gen', out_dir,
