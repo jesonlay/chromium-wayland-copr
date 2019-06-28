@@ -136,7 +136,7 @@ BuildRequires: pkgconfig(xtst), pkgconfig(xscrnsaver)
 BuildRequires: pkgconfig(dbus-1), pkgconfig(libudev)
 BuildRequires: pkgconfig(gnome-keyring-1)
 BuildRequires: pkgconfig(libffi)
-#for vaapi
+# for vaapi
 BuildRequires:  pkgconfig(libva)
 # remove_bundled_libraries.py --do-remove
 BuildRequires: python2-rpm-macros
@@ -537,7 +537,7 @@ gn_args=(
     use_libpci=true
     use_pulseaudio=true
     use_system_freetype=true
-    use_vaapi=true
+#   use_vaapi=true
     use_xkbcommon=true
     use_ozone=true
     use_system_libdrm=true
@@ -895,7 +895,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 - Add mesa development packages to BuildRequires for Fedora 27 and later
 
 * Mon Sep 11 2017 - Ting-Wei Lan <lantw44@gmail.com> - 61.0.3163.79-101
-- Reduce symbol_level to 1 to fix find-debuginfo.sh on Fedora 26
+ Reduce symbol_level to 1 to fix find-debuginfo.sh on Fedora 26
 
 * Thu Sep 07 2017 - Ting-Wei Lan <lantw44@gmail.com> - 61.0.3163.79-100
 - Update to 61.0.3163.79
@@ -945,8 +945,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 - Replace all HTTP links in comments with HTTPS links
 - Group patch files by using 2-digit numbers
 
-* Thu Mar 30 2017 - Ting-Wei Lan <lantw44@gmail.com> - 57.0.2987.133-100
-- Update to 57.0.2987.133
+ hu Mar 30 2017 - Ting-Wei Lan <lantw44@gmail.com> - 57.0.2987.133-100
+ Update to 57.0.2987.133
 
 * Fri Mar 17 2017 - Ting-Wei Lan <lantw44@gmail.com> - 57.0.2987.110-100
 - Update to 57.0.2987.110
@@ -995,9 +995,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 - Unbundle python2-jinja2, python2-markupsafe, python2-ply by using symlinks
 - Unbundle python-beautifulsoup4, python-html5lib in catapult
 
-* Fri Sep 30 2016 - Ting-Wei Lan <lantw44@gmail.com> - 53.0.2785.143-1
+ ri Sep 30 2016 - Ting-Wei Lan <lantw44@gmail.com> - 53.0.2785.143-1
 - Update to 53.0.2785.143
-
 * Thu Sep 15 2016 - Ting-Wei Lan <lantw44@gmail.com> - 53.0.2785.116-1
 - Update to 53.0.2785.116
 
