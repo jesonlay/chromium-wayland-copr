@@ -694,6 +694,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %dir %{chromiumdir}/swiftshader
 %{chromiumdir}/swiftshader/libEGL.so
 %{chromiumdir}/swiftshader/libGLESv2.so
+%{chromiumdir}/swiftshader/libvulkan.so
 %{chromiumdir}/MEIPreload/manifest.json
 %{chromiumdir}/MEIPreload/preloaded_data.pb
 
