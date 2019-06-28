@@ -371,6 +371,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/node \
           third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2 \
           third_party/openscreen \
+          third_party/openscreen/src/third_party/tinycbor \
           third_party/ots \
           third_party/openvr \
           third_party/opus \
@@ -434,7 +435,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/webrtc/rtc_base/third_party/sigslot \
           third_party/widevine \
           third_party/woff2 \
-          third_party/zlib/google \
+          third_party/zlib \
           url/third_party/mozilla \
           v8/src/third_party/siphash \
           v8/src/third_party/valgrind \
@@ -479,7 +480,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
 %endif
     snappy \
     yasm \
-    zlib
+#    zlib
 
 ./build/download_nacl_toolchains.py --packages \
     nacl_x86_glibc,nacl_x86_newlib,pnacl_newlib,pnacl_translator sync --extract
