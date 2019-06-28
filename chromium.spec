@@ -418,6 +418,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/swiftshader/third_party/llvm-7.0 \
           third_party/swiftshader/third_party/llvm-subzero \
           third_party/swiftshader/third_party/subzero \
+          third_party/swiftshader/third_party/SPIRV-Headers \
           third_party/tcmalloc \
           third_party/unrar \
           third_party/usrsctp \
