@@ -60,7 +60,7 @@ index f107e9f..66194da 100644
 +  host_id_ = host_id;
    if (am_running_in_ws_mode()) {
      ui::ozone::mojom::DrmDevicePtr drm_device_ptr_ui, drm_device_ptr_ws;
- 
+     ui::ozone::mojom::DeviceCursorPtr cursor_ptr_ws, cursor_ptr_io; 
 diff --git a/ui/ozone/platform/drm/host/drm_device_connector.h b/ui/ozone/platform/drm/host/drm_device_connector.h
 index 5532c8a..5e9b1ca 100644
 --- a/ui/ozone/platform/drm/host/drm_device_connector.h
