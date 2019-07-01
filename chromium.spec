@@ -418,6 +418,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/swiftshader/third_party/llvm-7.0 \
           third_party/swiftshader/third_party/llvm-subzero \
           third_party/swiftshader/third_party/subzero \
+          third_party/swiftshader/third_party/SPIRV-Headers \
           third_party/tcmalloc \
           third_party/unrar \
           third_party/usrsctp \
@@ -693,6 +694,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %dir %{chromiumdir}/swiftshader
 %{chromiumdir}/swiftshader/libEGL.so
 %{chromiumdir}/swiftshader/libGLESv2.so
+%{chromiumdir}/swiftshader/libvulkan.so
 %{chromiumdir}/MEIPreload/manifest.json
 %{chromiumdir}/MEIPreload/preloaded_data.pb
 
