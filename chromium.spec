@@ -53,7 +53,7 @@
 %bcond_with ozone
 
 Name:       chromium
-Version:    77.0.3833.0 
+Version:    77.0.3842.0 
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
@@ -102,7 +102,7 @@ Patch60:    chromium-python2.patch
 #Patch62:    enable-vaapi.patch
 # Pull upstream patches
 #Patch63:    onpresent.patch
-Patch61:     ozone-fix-hostdrmdevice-not-recover.patch
+#Patch61:     ozone-fix-hostdrmdevice-not-recover.patch
 # Pull patches from Fedora
 # https://src.fedoraproject.org/rpms/chromium/c/9071ee2d2f996b84
 # Patch80:    chromium-webrtc-cstring.patch
