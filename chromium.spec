@@ -562,6 +562,10 @@ gn_args=(
     'system_libdir="%{_lib}"'
     'custom_toolchain="//build/toolchain/linux/unbundle:default"'
     'host_toolchain="//build/toolchain/linux/unbundle:default"'
+# Google api key
+    'google_api_key="AIzaSyAlOtWtGf-TtpZA_gith5Da3jOapmK0xz4"'
+    'google_default_client_id="225168336484-0tva1s21obg7qiq61jte3b3torc9lmj2.apps.googleusercontent.com"'
+    'google_default_client_secret="0Wpqb_SDyeSnVi_9NikO8WmN"'
 )
 
 gn_args+=(
