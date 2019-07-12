@@ -339,6 +339,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
           third_party/libaom \
           third_party/libaom/source/libaom/third_party/vector \
           third_party/libaom/source/libaom/third_party/x86inc \
+          third_party/libdrm \
           third_party/libjingle \
           third_party/libphonenumber \
           third_party/libsecret \
