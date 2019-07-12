@@ -53,7 +53,7 @@
 %bcond_with ozone
 
 Name:       chromium
-Version:    77.0.3831.6 
+Version:    77.0.3824.6 
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
@@ -544,6 +544,8 @@ gn_args=(
     use_ozone=true
     use_system_libdrm=true
     ozone_platform_wayland=true
+    ozone_platform_gbm=true
+    ozone_platform_x11=true
     use_system_minigbm=true
     enable_widevine=true
 %if %{with system_harfbuzz}
