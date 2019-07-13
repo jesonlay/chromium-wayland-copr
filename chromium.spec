@@ -465,7 +465,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
 %if %{with system_libicu}
     icu \
 %endif
-    libdrm \
+#    libdrm \
     libjpeg \
     libpng \
 %if %{with system_libvpx}
@@ -543,11 +543,13 @@ gn_args=(
 #   use_vaapi=true
     use_xkbcommon=true
     use_ozone=true
-    use_system_libdrm=true
+#    use_system_libdrm=true
+    ozone_auto_platforms = false
+    ozone_platform = "x11"
     ozone_platform_wayland=true
     ozone_platform_gbm=true
     ozone_platform_x11=true
-    use_system_minigbm=true
+#    use_system_minigbm=true
     enable_widevine=true
 %if %{with system_harfbuzz}
     use_system_harfbuzz=true
