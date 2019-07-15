@@ -297,8 +297,8 @@ gn_args=(
     ozone_auto_platforms=false
    'ozone_platform="x11"'
     ozone_platform_wayland=true
-    ozone_platform_gbm=true
-#    ozone_platform_x11=true
+#    ozone_platform_gbm=true
+    ozone_platform_x11=true
     use_system_minigbm=true
     enable_widevine=true
 %if %{with system_harfbuzz}
