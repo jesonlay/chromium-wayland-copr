@@ -241,11 +241,11 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     fontconfig \
 %if %{with system_harfbuzz}
     harfbuzz-ng \
-%endif
+    %endif
 %if %{with system_libicu}
     icu \
 %endif
-#    libdrm \
+    libdrm \
     libjpeg \
     libpng \
 %if %{with system_libvpx}
