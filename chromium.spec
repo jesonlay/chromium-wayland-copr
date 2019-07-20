@@ -12,7 +12,7 @@
 # %if 0%{?fedora} >= 30
 # %bcond_without system_harfbuzz
 # %else
-%bcond_with system_harfbuzz
+# %bcond_with system_harfbuzz
 # %endif
 
 # Require libxml2 > 2.9.4 for XML_PARSE_NOXXE
@@ -239,9 +239,6 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     flac \
     freetype \
     fontconfig \
-%if %{with system_harfbuzz}
-    harfbuzz-ng \
-%endif
 %if %{with system_libicu}
     icu \
 %endif
@@ -332,9 +329,7 @@ gn_args=(
     ozone_platform_x11=true
     use_system_minigbm=true
     enable_widevine=true
-%if %{with system_harfbuzz}
-    use_system_harfbuzz=true
-%endif
+#    use_system_harfbuzz=true
     'ffmpeg_branding="ChromeOS"'
     proprietary_codecs=true
     rtc_use_pipewire=true
