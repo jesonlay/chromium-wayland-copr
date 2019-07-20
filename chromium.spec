@@ -12,7 +12,7 @@
 # %if 0%{?fedora} >= 30
 # %bcond_without system_harfbuzz
 # %else
-# %bcond_with system_harfbuzz
+%bcond_with system_harfbuzz
 # %endif
 
 # Require libxml2 > 2.9.4 for XML_PARSE_NOXXE
@@ -241,7 +241,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     fontconfig \
 %if %{with system_harfbuzz}
     harfbuzz-ng \
-    %endif
+%endif
 %if %{with system_libicu}
     icu \
 %endif
