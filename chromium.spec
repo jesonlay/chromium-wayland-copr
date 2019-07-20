@@ -9,11 +9,11 @@
 # $ curl -s 'https://omahaproxy.appspot.com/all?os=linux&channel=stable' | sed 1d | cut -d , -f 3
 
 # Require harfbuzz >= 2.0.0 for hb_ot_tags_from_script_and_language
-%if 0%{?fedora} >= 30
-%bcond_without system_harfbuzz
-%else
-%bcond_with system_harfbuzz
-%endif
+# %if 0%{?fedora} >= 30
+# %bcond_without system_harfbuzz
+# %else
+# %bcond_with system_harfbuzz
+# %endif
 
 # Require libxml2 > 2.9.4 for XML_PARSE_NOXXE
 %bcond_without system_libxml2
