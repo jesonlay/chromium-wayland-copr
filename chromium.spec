@@ -646,7 +646,7 @@ for i in 16 32; do
     install -m 644 chrome/app/theme/default_100_percent/chromium/product_logo_$i.png \
         %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-browser.png
 done
-for i in 22 24 32 48 64 128 256; do
+for i in 24 32 48 64 128 256; do
     if [ ${i} = 32 ]; then ext=xpm; else ext=png; fi
     if [ ${i} = 32 ]; then dir=linux/; else dir=; fi
     mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps
@@ -677,7 +677,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/applications/chromium-browser.desktop
 %{_datadir}/gnome-control-center/default-apps/chromium-browser.xml
 %{_datadir}/icons/hicolor/16x16/apps/chromium-browser.png
-%{_datadir}/icons/hicolor/22x22/apps/chromium-browser.png
 %{_datadir}/icons/hicolor/24x24/apps/chromium-browser.png
 %{_datadir}/icons/hicolor/32x32/apps/chromium-browser.png
 %{_datadir}/icons/hicolor/32x32/apps/chromium-browser.xpm
