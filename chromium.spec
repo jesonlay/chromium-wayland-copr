@@ -9,11 +9,11 @@
 # $ curl -s 'https://omahaproxy.appspot.com/all?os=linux&channel=stable' | sed 1d | cut -d , -f 3
 
 # Require harfbuzz >= 2.0.0 for hb_ot_tags_from_script_and_language
-# %if 0%{?fedora} >= 30
-# %bcond_without system_harfbuzz
-# %else
-# %bcond_with system_harfbuzz
-# %endif
+%if 0%{?fedora} >= 30
+%bcond_without system_harfbuzz
+%else
+%bcond_with system_harfbuzz
+%endif
 
 # Require libxml2 > 2.9.4 for XML_PARSE_NOXXE
 %bcond_without system_libxml2
@@ -231,7 +231,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
     -i third_party/ffmpeg/chromium/scripts/generate_gn.py \
     -i tools/gn/bootstrap/bootstrap.py
-    
+
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
 %if %{with system_ffmpeg}
     ffmpeg \
@@ -239,11 +239,15 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     flac \
     freetype \
     fontconfig \
+%if %{with system_harfbuzz}
+    harfbuzz-ng \
+%endif
 %if %{with system_libicu}
     icu \
 %endif
-    libdrm \
+#    libdrm \
     libjpeg \
+    libpng \
 %if %{with system_libvpx}
     libvpx \
 %endif
@@ -257,10 +261,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     re2 \
 %endif
     snappy \
-    yasm 
-    
-#    zlib
-
+    yasm \
+    zlib
 ./build/download_nacl_toolchains.py --packages \
     nacl_x86_glibc,nacl_x86_newlib,pnacl_newlib,pnacl_translator sync --extract
     
