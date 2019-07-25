@@ -74,7 +74,6 @@ Source0:    https://commondatastorage.googleapis.com/chromium-browser-official/c
 #
 # The repackaged source tarball used here is produced by:
 # ./chromium-latest.py --stable --ffmpegclean --ffmpegarm --deleteunrar
-#Source0:    chromium-%{version}-clean.tar.xz
 Source1:    chromium-latest.py
 Source2:    chromium-ffmpeg-clean.sh
 Source3:    chromium-ffmpeg-free-sources.py
