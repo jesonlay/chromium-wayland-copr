@@ -260,8 +260,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     re2 \
 %endif
     snappy \
-    yasm \
-    zlib
+    yasm 
+#    zlib
 
 
 ./build/download_nacl_toolchains.py --packages \
