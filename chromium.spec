@@ -246,7 +246,6 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
 %endif
     libdrm \
     libjpeg \
-    libpng \
 %if %{with system_libvpx}
     libvpx \
 %endif
