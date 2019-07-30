@@ -10,7 +10,7 @@
 
 # Require harfbuzz >= 2.0.0 for hb_ot_tags_from_script_and_language
 
-%bcond_with system_harfbuzz
+%bcond_without system_harfbuzz
 
 
 # Require libxml2 > 2.9.4 for XML_PARSE_NOXXE
@@ -95,8 +95,12 @@ Source12:   chromium-browser.xml
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
 Patch60:    chromium-python2.patch
-# Patch61:    chromium-widevine-r4.patch
-# Patch62:    enable-vaapi.patch
+Patch61:    chromium-widevine.patch
+Patch62:    enable-vaapi.patch
+Patch63:    vaapi.patch
+Patch64:    memory.patch
+Patch65:    harfbuzz-subset.patch
+Patch66:    chromium-skia-harmony-r1.patch
 # Pull upstream patches
 # Patch63:    onpresent.patch
 # Patch61:     ozone-fix-hostdrmdevice-not-recover.patch
@@ -309,15 +313,21 @@ gn_args=(
     use_custom_libcxx=false
     use_aura=true
     use_cups=true
-    use_gnome_keyring=true
-    use_gio=true
+    use_gnome_keyring=false
+    use_gio=false
+    use_dbus=true
     use_jumbo_build=true
     use_kerberos=true
     use_libpci=true
     use_pulseaudio=false
     use_alsa=true
     use_system_freetype=true
-#   use_vaapi=true
+    use_vaapi=true
+    enable_hevc_demuxing=true
+    enable_ac3_eac3_audio_demuxing=true
+    enable_mpeg_h_audio_demuxing=true
+    enable_dolby_vision_demuxing=true
+    enable_mse_mpeg2ts_stream_parser=true
     use_xkbcommon=true
     use_ozone=true
     use_system_libdrm=true
@@ -328,7 +338,7 @@ gn_args=(
     ozone_platform_x11=true
     use_system_minigbm=true
     enable_widevine=true
-#    use_system_harfbuzz=true
+    use_system_harfbuzz=true
     'ffmpeg_branding="ChromeOS"'
     proprietary_codecs=true
     rtc_use_pipewire=true
