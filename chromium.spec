@@ -100,7 +100,7 @@ Patch62:    enable-vaapi.patch
 Patch63:    vaapi.patch
 Patch64:    memory.patch
 Patch65:    harfbuzz-subset.patch
-Patch66:    chromium-skia-harmony-r1.patch
+# Patch66:    chromium-skia-harmony-r1.patch
 # Pull upstream patches
 # Pull patches from Fedora
 # https://src.fedoraproject.org/rpms/chromium/c/9071ee2d2f996b84
