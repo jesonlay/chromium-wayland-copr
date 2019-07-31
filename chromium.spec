@@ -102,8 +102,6 @@ Patch64:    memory.patch
 Patch65:    harfbuzz-subset.patch
 Patch66:    chromium-skia-harmony-r1.patch
 # Pull upstream patches
-# Patch63:    onpresent.patch
-# Patch61:     ozone-fix-hostdrmdevice-not-recover.patch
 # Pull patches from Fedora
 # https://src.fedoraproject.org/rpms/chromium/c/9071ee2d2f996b84
 # Patch80:    chromium-webrtc-cstring.patch
