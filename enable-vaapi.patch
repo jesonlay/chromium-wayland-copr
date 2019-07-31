@@ -51,7 +51,7 @@ Index: dev/chrome/browser/about_flags.cc
      {
 @@ -1993,10 +1993,10 @@ const FeatureEntry kFeatureEntries[] = {
       FEATURE_VALUE_TYPE(service_manager::features::kXRSandbox)},
- #endif  // ENABLE_ISOLATED_XR_SERVICE
+ #endif  // !defined(OS_ANDROID)
  #endif  // ENABLE_VR
 -#if defined(OS_CHROMEOS)
 +#if defined(OS_LINUX) && !defined(OS_ANDROID)
@@ -283,7 +283,7 @@ Index: dev/media/gpu/vaapi/vaapi_video_decode_accelerator.cc
 +#endif
  
    for (size_t i = 0; i < buffers.size(); ++i) {
-     DCHECK(requested_pic_size_ == buffers[i].size());
+     // If we aren't in BufferAllocationMode::kNone, this |picture| is
 @@ -651,9 +658,13 @@ void VaapiVideoDecodeAccelerator::Assign
      // only used as a copy destination. Therefore, the VaapiWrapper used and
      // owned by |picture| is |vpp_vaapi_wrapper_|.
