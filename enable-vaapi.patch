@@ -115,6 +115,25 @@ Index: dev/chrome/browser/flag_descriptions.h
  extern const char kAppServiceAshName[];
  extern const char kAppServiceAshDescription[];
  
+Index: dev/media/gpu/vaapi/BUILD.gn
+===================================================================
+--- dev/media/gpu/vaapi/BUILD.gn.bak
++++ dev/media/gpu/vaapi/BUILD.gn
+@@ -118,12 +118,12 @@ source_set("vaapi") {
+     ]
+   }
+ 
+-  if (ozone_platform_gbm || use_egl) {
++  if (use_ozone || use_egl) {
+     sources += [
+       "vaapi_picture_native_pixmap.cc",
+       "vaapi_picture_native_pixmap.h",
+     ]
+-    if (ozone_platform_gbm) {
++    if (use_ozone) {
+       sources += [
+         "vaapi_picture_native_pixmap_ozone.cc",
+         "vaapi_picture_native_pixmap_ozone.h",
 Index: dev/content/gpu/BUILD.gn
 ===================================================================
 --- dev.orig/content/gpu/BUILD.gn
