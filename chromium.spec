@@ -388,6 +388,7 @@ gn_args+=(
 %else
 ninja -v %{_smp_mflags} -C out/Release chrome chrome_sandbox chromedriver
 %endif
+tree -if
 
 %install
 mkdir -p %{buildroot}%{_bindir}
