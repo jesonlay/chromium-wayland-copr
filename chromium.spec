@@ -435,7 +435,8 @@ for i in 24 32 48 64 128 256; do
     install -m 644 chrome/app/theme/chromium/${dir}product_logo_$i.${ext} \
         %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-browser.${ext}
 done
-
+install -m 644 chrome/app/theme/chromium/product_logo_mono_22.png \
+    %{buildroot}%{_datadir}/icons/hicolor/22x22/apps/chromium-browser.png
 
 %post
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
