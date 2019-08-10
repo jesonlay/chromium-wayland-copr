@@ -282,7 +282,6 @@ ln -s %{python2_sitelib}/ply third_party/ply
 mkdir -p third_party/node/linux/node-linux-x64/bin
 ln -s %{_bindir}/node third_party/node/linux/node-linux-x64/bin/node
 
-
 %build
 export AR=ar NM=nm
 export PNACLPYTHON=%{__python2}
