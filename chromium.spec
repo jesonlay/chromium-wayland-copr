@@ -98,7 +98,7 @@ Patch60:    chromium-python2.patch
 Patch61:    chromium-widevine.patch
 #Patch62:    enable-vaapi.patch
 #Patch63:    vaapi.patch
-Patch63:    harfbuzz-subset.patch
+#Patch63:    harfbuzz-subset.patch
 # Patch66:    chromium-skia-harmony-r1.patch
 # Pull upstream patches
 # Pull patches from Fedora
