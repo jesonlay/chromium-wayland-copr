@@ -228,6 +228,7 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
     -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
     -i third_party/ffmpeg/chromium/scripts/generate_gn.py \
+    -i build/linux/sysroot_scripts/install-sysroot.py \
     -i tools/gn/bootstrap/bootstrap.py
 
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
