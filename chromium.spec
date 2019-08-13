@@ -461,6 +461,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/applications/chromium-browser.desktop
 %{_datadir}/gnome-control-center/default-apps/chromium-browser.xml
 %{_datadir}/icons/hicolor/16x16/apps/chromium-browser.png
+%{_datadir}/icons/hicolor/22x22/apps/chromium-browser.png
 %{_datadir}/icons/hicolor/24x24/apps/chromium-browser.png
 %{_datadir}/icons/hicolor/32x32/apps/chromium-browser.png
 %{_datadir}/icons/hicolor/32x32/apps/chromium-browser.xpm
