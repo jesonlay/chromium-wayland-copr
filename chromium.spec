@@ -10,7 +10,7 @@
 
 # Require harfbuzz >= 2.0.0 for hb_ot_tags_from_script_and_language
 
-%bcond_without system_harfbuzz
+%bcond_with system_harfbuzz
 
 
 # Require libxml2 > 2.9.4 for XML_PARSE_NOXXE
@@ -51,7 +51,7 @@
 %bcond_with ozone
 
 Name:       chromium
-Version:    78.0.3880.4
+Version:    78.0.3887.7
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
