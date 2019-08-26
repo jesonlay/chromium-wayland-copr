@@ -96,7 +96,7 @@ Source12:   chromium-browser.xml
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
 Patch60:    chromium-python2.patch
 Patch61:    chromium-widevine.patch
-#Patch62:    enable-vaapi.patch
+Patch62:    enable-vaapi.patch
 #Patch63:    vaapi.patch
 #Patch63:    harfbuzz-subset.patch
 # Patch66:    chromium-skia-harmony-r1.patch
@@ -319,12 +319,12 @@ gn_args=(
     use_pulseaudio=false
     use_alsa=true
     use_system_freetype=true
-#    use_vaapi=true
-#    enable_hevc_demuxing=true
-#    enable_ac3_eac3_audio_demuxing=true
-#    enable_mpeg_h_audio_demuxing=true
-#    enable_dolby_vision_demuxing=true
-#    enable_mse_mpeg2ts_stream_parser=true
+    use_vaapi=true
+    enable_hevc_demuxing=true
+    enable_ac3_eac3_audio_demuxing=true
+    enable_mpeg_h_audio_demuxing=true
+    enable_dolby_vision_demuxing=true
+    enable_mse_mpeg2ts_stream_parser=true
     use_xkbcommon=true
     use_ozone=true
     use_system_libdrm=true
