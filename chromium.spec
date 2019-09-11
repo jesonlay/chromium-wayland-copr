@@ -9,11 +9,9 @@
 # $ curl -s 'https://omahaproxy.appspot.com/all?os=linux&channel=stable' | sed 1d | cut -d , -f 3
 
 # Require harfbuzz >= 2.0.0 for hb_ot_tags_from_script_and_language
-%if 0%{?fedora} >= 30
-%bcond_without system_harfbuzz
-%else
+
 %bcond_with system_harfbuzz
-%endif
+
 
 # Require libxml2 > 2.9.4 for XML_PARSE_NOXXE
 %bcond_without system_libxml2
@@ -53,7 +51,7 @@
 %bcond_with ozone
 
 Name:       chromium
-Version:    77.0.3824.6 
+Version:    78.0.3902.4
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
@@ -74,7 +72,6 @@ Source0:    https://commondatastorage.googleapis.com/chromium-browser-official/c
 #
 # The repackaged source tarball used here is produced by:
 # ./chromium-latest.py --stable --ffmpegclean --ffmpegarm --deleteunrar
-#Source0:    chromium-%{version}-clean.tar.xz
 Source1:    chromium-latest.py
 Source2:    chromium-ffmpeg-clean.sh
 Source3:    chromium-ffmpeg-free-sources.py
@@ -98,11 +95,12 @@ Source12:   chromium-browser.xml
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
 Patch60:    chromium-python2.patch
-# Patch61:    chromium-widevine-r4.patch
-# Patch62:    enable-vaapi.patch
+Patch61:    chromium-widevine.patch
+#Patch62:    enable-vaapi.patch
+#Patch63:    vaapi.patch
+#Patch63:    harfbuzz-subset.patch
+# Patch66:    chromium-skia-harmony-r1.patch
 # Pull upstream patches
-# Patch63:    onpresent.patch
-# Patch61:     ozone-fix-hostdrmdevice-not-recover.patch
 # Pull patches from Fedora
 # https://src.fedoraproject.org/rpms/chromium/c/9071ee2d2f996b84
 # Patch80:    chromium-webrtc-cstring.patch
@@ -140,7 +138,7 @@ BuildRequires: pkgconfig(libffi)
 BuildRequires:  pkgconfig(libva)
 # remove_bundled_libraries.py --do-remove
 BuildRequires: python2-rpm-macros
-BuildRequires: python2-beautifulsoup4
+# BuildRequires: python2-beautifulsoup4
 BuildRequires: python2-html5lib
 BuildRequires: python2-markupsafe
 BuildRequires: python2-protobuf
@@ -230,228 +228,9 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
     -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
     -i third_party/ffmpeg/chromium/scripts/generate_gn.py \
+    -i build/linux/sysroot_scripts/install-sysroot.py \
     -i tools/gn/bootstrap/bootstrap.py
-    
-./build/linux/unbundle/remove_bundled_libraries.py --do-remove \
-          base/third_party/dmg_fp \
-          base/third_party/dynamic_annotations \
-          base/third_party/cityhash \
-          base/third_party/icu \
-          base/third_party/nspr \
-          base/third_party/superfasthash \
-          base/third_party/symbolize \
-          base/third_party/valgrind \
-          base/third_party/xdg_mime \
-          base/third_party/xdg_user_dirs \
-          tools/gn/base/third_party/icu \
-          buildtools/third_party/libc++ \
-          buildtools/third_party/libc++abi \
-          chrome/third_party/mozilla_security_manager \
-          courgette/third_party \
-          native_client/src/third_party/dlmalloc \
-          native_client/src/third_party/valgrind \
-          native_client_sdk/src/libraries/third_party/newlib-extras \
-          net/third_party/mozilla_security_manager \
-          net/third_party/nss \
-          net/third_party/quic \
-          net/third_party/uri_template \
-          third_party/abseil-cpp \
-          third_party/adobe \
-          third_party/axe-core \
-          third_party/angle \
-          third_party/angle/src/common/third_party/base \
-          third_party/angle/src/common/third_party/smhasher \
-          third_party/angle/src/common/third_party/xxhash \
-          third_party/angle/src/third_party/compiler \
-          third_party/angle/src/third_party/libXNVCtrl \
-          third_party/angle/src/third_party/trace_event \
-          third_party/angle/third_party/glslang \
-          third_party/angle/third_party/spirv-headers \
-          third_party/angle/third_party/spirv-tools \
-          third_party/angle/third_party/vulkan-headers \
-          third_party/angle/third_party/vulkan-loader \
-          third_party/angle/third_party/vulkan-tools \
-          third_party/angle/third_party/vulkan-validation-layers \
-          third_party/apple_apsl \
-          third_party/axe-core \
-          third_party/blink \
-          third_party/boringssl \
-          third_party/boringssl/src/third_party/fiat \
-          third_party/boringssl/src/third_party/sike \
-          third_party/boringssl/linux-x86_64/crypto/third_party/sike \
-          third_party/breakpad \
-          third_party/breakpad/breakpad/src/third_party/curl \
-          third_party/brotli \
-          third_party/cacheinvalidation \
-          third_party/catapult \
-          third_party/catapult/common/py_vulcanize/third_party/rcssmin \
-          third_party/catapult/common/py_vulcanize/third_party/rjsmin \
-          third_party/catapult/third_party/polymer \
-          third_party/catapult/tracing/third_party/d3 \
-          third_party/catapult/tracing/third_party/gl-matrix \
-          third_party/catapult/tracing/third_party/jszip \
-          third_party/catapult/tracing/third_party/mannwhitneyu \
-          third_party/catapult/tracing/third_party/oboe \
-          third_party/catapult/tracing/third_party/pako \
-          third_party/ced \
-          third_party/cld_3 \
-          third_party/closure_compiler \
-          third_party/crashpad \
-          third_party/crashpad/crashpad/third_party/lss \
-          third_party/crashpad/crashpad/third_party/zlib \
-          third_party/crc32c \
-          third_party/cros_system_api \
-          third_party/dav1d \
-          third_party/devscripts \
-          third_party/dawn \
-          third_party/dom_distiller_js \
-          third_party/emoji-segmenter \
-%if !%{with system_ffmpeg}
-          third_party/ffmpeg \
-%endif
-          third_party/flatbuffers \
-          third_party/flot \
-          third_party/freetype \
-          third_party/gestures \
-          third_party/glslang \
-          third_party/google_input_tools \
-          third_party/google_input_tools/third_party/closure_library \
-          third_party/google_input_tools/third_party/closure_library/third_party/closure \
-          third_party/googletest \
-          third_party/hunspell \
-%if !%{with system_harfbuzz}
-          third_party/harfbuzz-ng \
-%endif
-          third_party/iccjpeg \
-%if !%{with system_libicu}
-          third_party/icu \
-%endif
-          third_party/inspector_protocol \
-          third_party/wayland \
-          third_party/wayland-protocols \
-          third_party/jinja2 \
-          third_party/jsoncpp \
-          third_party/jstemplate \
-          third_party/khronos \
-          third_party/leveldatabase \
-          third_party/libXNVCtrl \
-          third_party/libaddressinput \
-          third_party/libaom \
-          third_party/libaom/source/libaom/third_party/vector \
-          third_party/libaom/source/libaom/third_party/x86inc \
-          third_party/libdrm \
-          third_party/libjingle \
-          third_party/libphonenumber \
-          third_party/libsecret \
-          third_party/libsrtp \
-          third_party/libsync \
-          third_party/libudev \
-%if !%{with system_libvpx}
-          third_party/libvpx \
-          third_party/libvpx/source/libvpx/third_party/x86inc \
-%endif
-          third_party/libwebm \
-          third_party/libwebp \
-%if %{with system_libxml2}
-          third_party/libxml/chromium \
-%else
-          third_party/libxml \
-%endif
-          third_party/libyuv \
-          third_party/llvm \
-          third_party/lss \
-          third_party/lzma_sdk \
-          third_party/markupsafe \
-          third_party/minigbm \
-          third_party/markdown \
-          third_party/material_design_icons \
-          third_party/mesa \
-          third_party/metrics_proto \
-          third_party/modp_b64 \
-          third_party/nasm \
-          third_party/node \
-          third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2 \
-          third_party/openscreen \
-          third_party/openscreen/src/third_party/tinycbor \
-          third_party/ots \
-          third_party/openvr \
-          third_party/opus \
-          third_party/openh264 \
-          third_party/pdfium \
-          third_party/pdfium/third_party/agg23 \
-          third_party/pdfium/third_party/base \
-          third_party/pdfium/third_party/bigint \
-          third_party/pdfium/third_party/freetype \
-          third_party/pdfium/third_party/lcms \
-          third_party/pdfium/third_party/libopenjpeg20 \
-          third_party/pdfium/third_party/libpng16 \
-          third_party/pdfium/third_party/libtiff \
-          third_party/pdfium/third_party/skia_shared \
-          third_party/perfetto \
-          third_party/pffft \
-%if !%{with system_ply}
-          third_party/ply \
-%endif
-          third_party/polymer \
-          third_party/protobuf \
-          third_party/protobuf/third_party/six \
-          third_party/pyjson5 \
-          third_party/qcms \
-%if !%{with system_re2}
-          third_party/re2 \
-%endif
-          third_party/rnnoise \
-          third_party/s2cellid \
-          third_party/sfntly \
-          third_party/shaderc \
-          third_party/skia \
-          third_party/skia/include/third_party/vulkan \
-          third_party/skia/include/third_party/skcms \
-          third_party/skia/third_party/gif \
-          third_party/skia/third_party/skcms \
-          third_party/skia/third_party/vulkan \
-          third_party/smhasher \
-          third_party/speech-dispatcher \
-          third_party/spirv-headers \
-          third_party/SPIRV-Tools \
-          third_party/sqlite \
-          third_party/swiftshader \
-          third_party/swiftshader/third_party/llvm-7.0 \
-          third_party/swiftshader/third_party/llvm-subzero \
-          third_party/swiftshader/third_party/subzero \
-          third_party/swiftshader/third_party/SPIRV-Headers \
-          third_party/tcmalloc \
-          third_party/unrar \
-          third_party/usrsctp \
-          third_party/usb_ids \
-          third_party/vulkan \
-          third_party/web-animations-js \
-          third_party/webdriver \
-          third_party/webrtc \
-          third_party/webrtc/common_audio/third_party/fft4g \
-          third_party/webrtc/common_audio/third_party/spl_sqrt_floor \
-          third_party/webrtc/modules/third_party/fft \
-          third_party/webrtc/modules/third_party/g711 \
-          third_party/webrtc/modules/third_party/g722 \
-          third_party/webrtc/rtc_base/third_party/base64 \
-          third_party/webrtc/rtc_base/third_party/sigslot \
-          third_party/widevine \
-          third_party/woff2 \
-          third_party/zlib \
-          url/third_party/mozilla \
-          v8/src/third_party/siphash \
-          v8/src/third_party/valgrind \
-          v8/src/third_party/utf8-decoder \
-          v8/third_party/inspector_protocol \
-          v8/third_party/v8 \
-          base/third_party/libevent \
-          third_party/usb_ids \
-          third_party/adobe \
-          third_party/speech-dispatcher \
-          third_party/usb_ids \
-          third_party/xdg-utils \
-          third_party/yasm/run_yasm.py 
-          
+
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
 %if %{with system_ffmpeg}
     ffmpeg \
@@ -465,9 +244,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
 %if %{with system_libicu}
     icu \
 %endif
-#    libdrm \
+    libdrm \
     libjpeg \
-    libpng \
 %if %{with system_libvpx}
     libvpx \
 %endif
@@ -481,8 +259,8 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     re2 \
 %endif
     snappy \
-    yasm \
-    zlib
+    yasm 
+#    zlib
 
 ./build/download_nacl_toolchains.py --packages \
     nacl_x86_glibc,nacl_x86_newlib,pnacl_newlib,pnacl_translator sync --extract
@@ -504,7 +282,6 @@ ln -s %{python2_sitelib}/ply third_party/ply
 
 mkdir -p third_party/node/linux/node-linux-x64/bin
 ln -s %{_bindir}/node third_party/node/linux/node-linux-x64/bin/node
-
 
 %build
 export AR=ar NM=nm
@@ -533,27 +310,32 @@ gn_args=(
     use_custom_libcxx=false
     use_aura=true
     use_cups=true
-    use_gnome_keyring=true
-    use_gio=true
+    use_gnome_keyring=false
+    use_gio=false
+    use_dbus=true
     use_jumbo_build=true
     use_kerberos=true
     use_libpci=true
-    use_pulseaudio=true
+    use_pulseaudio=false
+    use_alsa=true
     use_system_freetype=true
-#   use_vaapi=true
+    use_vaapi=true
+    enable_hevc_demuxing=true
+    enable_ac3_eac3_audio_demuxing=true
+    enable_mpeg_h_audio_demuxing=true
+    enable_dolby_vision_demuxing=true
+    enable_mse_mpeg2ts_stream_parser=true
     use_xkbcommon=true
     use_ozone=true
-#    use_system_libdrm=true
-    ozone_auto_platforms = false
-    ozone_platform = "x11"
+    use_system_libdrm=true
+    ozone_auto_platforms=false
+   'ozone_platform="x11"'
     ozone_platform_wayland=true
-    ozone_platform_gbm=true
+#    ozone_platform_gbm=true
     ozone_platform_x11=true
-#    use_system_minigbm=true
+    use_system_minigbm=true
     enable_widevine=true
-%if %{with system_harfbuzz}
     use_system_harfbuzz=true
-%endif
     'ffmpeg_branding="ChromeOS"'
     proprietary_codecs=true
     rtc_use_pipewire=true
@@ -595,7 +377,7 @@ gn_args+=(
     symbol_level=0
 %endif
 )
-
+./build/linux/sysroot_scripts/install-sysroot.py --arch=amd64
 ./tools/gn/bootstrap/bootstrap.py --skip-generate-buildfiles --gn-gen-args "${gn_args[*]}"
 ./out/Release/gn gen out/Release \
     --script-executable=/usr/bin/python2 --args="${gn_args[*]}"
@@ -653,7 +435,9 @@ for i in 24 32 48 64 128 256; do
     install -m 644 chrome/app/theme/chromium/${dir}product_logo_$i.${ext} \
         %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/chromium-browser.${ext}
 done
-
+mkdir -p -p %{buildroot}%{_datadir}/icons/hicolor/22x22/apps
+install -m 644 chrome/app/theme/chromium/product_logo_22_mono.png \
+    %{buildroot}%{_datadir}/icons/hicolor/22x22/apps/chromium-browser.png
 
 %post
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
@@ -702,7 +486,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %dir %{chromiumdir}/swiftshader
 %{chromiumdir}/swiftshader/libEGL.so
 %{chromiumdir}/swiftshader/libGLESv2.so
-%{chromiumdir}/swiftshader/libvulkan.so
+%{chromiumdir}/swiftshader/libvk_swiftshader.so
 %{chromiumdir}/MEIPreload/manifest.json
 %{chromiumdir}/MEIPreload/preloaded_data.pb
 
