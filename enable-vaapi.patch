@@ -87,9 +87,9 @@ Index: dev/chrome/browser/flag_descriptions.cc
 +
 +#if defined(OS_CHROMEOS)
 +
- const char kAppServiceAshName[] = "App Service Ash";
- const char kAppServiceAshDescription[] =
-     "Use the App Service to provide data to the Ash UI, such as the shelf and "
+ const char kAggregatedMlAppRankingName[] = "Rank suggested apps with ML.";
+ const char kAggregatedMlAppRankingDescription[] =
+     "Use the aggregated ML model to rank the suggested apps."; 
 Index: dev/chrome/browser/flag_descriptions.h
 ===================================================================
 --- dev.orig/chrome/browser/flag_descriptions.h
