@@ -43,7 +43,7 @@ if [ $XDG_SESSION_TYPE == "wayland" ]; then
 CHROMIUM_DISTRO_FLAGS+=" --ozone-platform=wayland \ "
 fi
 
-CHROMIUM_DISTRO_FLAGS=" --enable-plugins \
+CHROMIUM_DISTRO_FLAGS+=" --enable-plugins \
                         --enable-extensions \
                         --enable-user-scripts \
                         --enable-printing \
