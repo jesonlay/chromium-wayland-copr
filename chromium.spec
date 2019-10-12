@@ -51,7 +51,7 @@
 %bcond_with ozone
 
 Name:       chromium
-Version:    78.0.3902.4
+Version:    79.0.3938.0 
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
@@ -96,7 +96,7 @@ Source12:   chromium-browser.xml
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
 Patch60:    chromium-python2.patch
 Patch61:    chromium-widevine.patch
-Patch62:    enable-vaapi.patch
+#Patch62:    enable-vaapi.patch
 #Patch63:    vaapi.patch
 #Patch63:    harfbuzz-subset.patch
 # Patch66:    chromium-skia-harmony-r1.patch
