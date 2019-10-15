@@ -139,7 +139,7 @@ BuildRequires:  pkgconfig(libva)
 # remove_bundled_libraries.py --do-remove
 BuildRequires: python2-rpm-macros
 # BuildRequires: python2-beautifulsoup4
-BuildRequires: python2-html5lib
+#BuildRequires: python2-html5lib
 BuildRequires: python2-markupsafe
 BuildRequires: python2-protobuf
 BuildRequires: python2-simplejson
