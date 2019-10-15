@@ -95,7 +95,7 @@ Source12:   chromium-browser.xml
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
 Patch60:    chromium-python2.patch
-Patch61:    chromium-widevine.patch
+#Patch61:    chromium-widevine.patch
 #Patch62:    enable-vaapi.patch
 #Patch63:    vaapi.patch
 #Patch63:    harfbuzz-subset.patch
@@ -139,7 +139,7 @@ BuildRequires:  pkgconfig(libva)
 # remove_bundled_libraries.py --do-remove
 BuildRequires: python2-rpm-macros
 # BuildRequires: python2-beautifulsoup4
-#BuildRequires: python2-html5lib
+# BuildRequires: python2-html5lib
 BuildRequires: python2-markupsafe
 BuildRequires: python2-protobuf
 BuildRequires: python2-simplejson
