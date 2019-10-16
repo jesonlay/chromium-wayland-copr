@@ -51,7 +51,7 @@
 %bcond_with ozone
 
 Name:       chromium
-Version:    79.0.3938.0 
+Version:    79.0.3941.4
 Release:    100%{?dist}
 Summary:    A WebKit (Blink) powered web browser
 
