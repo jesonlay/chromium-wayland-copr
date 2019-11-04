@@ -94,7 +94,7 @@ Source12:   chromium-browser.xml
 # Don't use unversioned python commands. This patch is based on
 # https://src.fedoraproject.org/rpms/chromium/c/7048e95ab61cd143
 # https://src.fedoraproject.org/rpms/chromium/c/cb0be2c990fc724e
-Patch60:    chromium-python2.patch
+#Patch60:    chromium-python2.patch
 #Patch61:    chromium-widevine.patch
 #Patch62:    enable-vaapi.patch
 #Patch63:    vaapi.patch
@@ -219,17 +219,17 @@ Conflicts:     chromedriver-unstable
 
 # Don't use unversioned python commands in shebangs. This command is based on
 # https://src.fedoraproject.org/rpms/chromium/c/cdad6219176a7615
-sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
-    -i build/download_nacl_toolchains.py \
-    -i build/linux/unbundle/remove_bundled_libraries.py \
-    -i build/linux/unbundle/replace_gn_files.py \
-    -i tools/clang/scripts/update.py \
-    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter.py \
-    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
-    -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
-    -i third_party/ffmpeg/chromium/scripts/generate_gn.py \
-    -i build/linux/sysroot_scripts/install-sysroot.py \
-    -i tools/gn/bootstrap/bootstrap.py
+#sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
+#    -i build/download_nacl_toolchains.py \
+#    -i build/linux/unbundle/remove_bundled_libraries.py \
+#    -i build/linux/unbundle/replace_gn_files.py \
+#    -i tools/clang/scripts/update.py \
+#    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter.py \
+#    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
+#    -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
+#    -i third_party/ffmpeg/chromium/scripts/generate_gn.py \
+#    -i build/linux/sysroot_scripts/install-sysroot.py \
+#    -i tools/gn/bootstrap/bootstrap.py
 
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
 %if %{with system_ffmpeg}
@@ -285,7 +285,7 @@ ln -s %{_bindir}/node third_party/node/linux/node-linux-x64/bin/node
 
 %build
 export AR=ar NM=nm
-export PNACLPYTHON=%{__python2}
+# export PNACLPYTHON=%{__python2}
 
 # Fedora 25 doesn't have __global_cxxflags
 %if %{with fedora_compilation_flags}
