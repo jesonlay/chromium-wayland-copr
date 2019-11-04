@@ -17,7 +17,7 @@
 %bcond_without system_libxml2
 
 # https://github.com/dabeaz/ply/issues/66
-# %bcond_without system_ply
+%bcond_with system_ply
 
 # Requires re2 2016.07.21 for re2::LazyRE2
 %bcond_with system_re2
