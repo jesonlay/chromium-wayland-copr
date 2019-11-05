@@ -219,18 +219,17 @@ Conflicts:     chromedriver-unstable
 
 # Don't use unversioned python commands in shebangs. This command is based on
 # https://src.fedoraproject.org/rpms/chromium/c/cdad6219176a7615
-#sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
-#    -i build/download_nacl_toolchains.py \
+sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
 #    -i build/linux/unbundle/remove_bundled_libraries.py \
 #    -i build/linux/unbundle/replace_gn_files.py \
 #    -i tools/clang/scripts/update.py \
-#    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter.py \
-#    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
-#    -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
-#    -i third_party/ffmpeg/chromium/scripts/generate_gn.py \
+    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter.py \
+    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
+    -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
+    -i third_party/ffmpeg/chromium/scripts/generate_gn.py
 #    -i build/linux/sysroot_scripts/install-sysroot.py \
 #    -i tools/gn/bootstrap/bootstrap.py
-
+ln -s /usr/bin/python /usr/bin/python3
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
 %if %{with system_ffmpeg}
     ffmpeg \
@@ -264,7 +263,6 @@ Conflicts:     chromedriver-unstable
 
 ./build/download_nacl_toolchains.py --packages \
     nacl_x86_glibc,nacl_x86_newlib,pnacl_newlib,pnacl_translator sync --extract
-    
 ./tools/clang/scripts/update.py
 
 # sed -i 's|//third_party/usb_ids|/usr/share/hwdata|g' device/usb/BUILD.gn
@@ -285,7 +283,7 @@ ln -s %{_bindir}/node third_party/node/linux/node-linux-x64/bin/node
 
 %build
 export AR=ar NM=nm
-# export PNACLPYTHON=%{__python2}
+export PNACLPYTHON=%{__python2}
 
 # Fedora 25 doesn't have __global_cxxflags
 %if %{with fedora_compilation_flags}
