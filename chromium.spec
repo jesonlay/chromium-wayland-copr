@@ -137,6 +137,7 @@ BuildRequires: pkgconfig(libffi)
 # for vaapi
 BuildRequires:  pkgconfig(libva)
 # remove_bundled_libraries.py --do-remove
+BuildRequires: python
 BuildRequires: python2-rpm-macros
 # BuildRequires: python2-beautifulsoup4
 # BuildRequires: python2-html5lib
@@ -229,7 +230,6 @@ sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
     -i third_party/ffmpeg/chromium/scripts/generate_gn.py
 #    -i build/linux/sysroot_scripts/install-sysroot.py \
 #    -i tools/gn/bootstrap/bootstrap.py
-ln -s /usr/bin/python /usr/bin/python3
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
 %if %{with system_ffmpeg}
     ffmpeg \
