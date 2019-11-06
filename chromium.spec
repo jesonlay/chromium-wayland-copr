@@ -372,10 +372,10 @@ gn_args+=(
 %endif
 )
 ./build/linux/sysroot_scripts/install-sysroot.py --arch=amd64
-#./tools/gn/bootstrap/bootstrap.py --skip-generate-buildfiles --gn-gen-args "${gn_args[*]}"
-curl https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/latest -o gn.zip
-unzip gn.zip
-mv gn ./out/Release/
+git clone https://gn.googlesource.com/gn
+rm -drf gn/.git
+cp -drf gn/* tools/gn/
+./tools/gn/bootstrap/bootstrap.py --skip-generate-buildfiles --gn-gen-args "${gn_args[*]}"
 ./out/Release/gn gen out/Release \
     --script-executable=/usr/bin/python2 --args="${gn_args[*]}"
 
