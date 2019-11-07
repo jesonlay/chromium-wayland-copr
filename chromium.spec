@@ -137,7 +137,7 @@ BuildRequires: pkgconfig(libffi)
 # for vaapi
 BuildRequires:  pkgconfig(libva)
 # remove_bundled_libraries.py --do-remove
-BuildRequires: python
+BuildRequires: python, git
 BuildRequires: python2-rpm-macros
 # BuildRequires: python2-beautifulsoup4
 # BuildRequires: python2-html5lib
