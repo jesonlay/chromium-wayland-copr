@@ -264,7 +264,6 @@ Conflicts:     chromedriver-unstable
 # sed -i 's|//third_party/usb_ids|/usr/share/hwdata|g' device/usb/BUILD.gn
 # sed -i 's|SCANOUT_VDA_WRITE|SCANOUT_CPU_READ_WRITE|g' media/gpu/vaapi/vaapi_picture_native_pixmap_ozone.cc
 # Don't use static libstdc++
-sed -i '/-static-libstdc++/d' tools/gn/build/gen.py
 
 rm -rf third_party/markupsafe
 ln -s %{python2_sitearch}/markupsafe third_party/markupsafe
@@ -375,6 +374,8 @@ gn_args+=(
 git clone https://gn.googlesource.com/gn
 rm -drf gn/.git
 cp -drf gn/* tools/gn/
+
+sed -i '/-static-libstdc++/d' tools/gn/build/gen.py
 ./tools/gn/bootstrap/bootstrap.py --skip-generate-buildfiles --gn-gen-args "${gn_args[*]}"
 ./out/Release/gn gen out/Release \
     --script-executable=/usr/bin/python2 --args="${gn_args[*]}"
