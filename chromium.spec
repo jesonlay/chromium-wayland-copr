@@ -220,11 +220,11 @@ Conflicts:     chromedriver-unstable
 
 # Don't use unversioned python commands in shebangs. This command is based on
 # https://src.fedoraproject.org/rpms/chromium/c/cdad6219176a7615
-#sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
-#    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter.py \
-#    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
-#    -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
-#    -i third_party/ffmpeg/chromium/scripts/generate_gn.py
+sed -i '1s:^#!/usr/bin/\(python\|env python\)$:#!%{__python2}:' \
+    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter.py \
+    -i third_party/dom_distiller_js/protoc_plugins/json_values_converter_tests.py \
+    -i third_party/ffmpeg/chromium/scripts/build_ffmpeg.py \
+    -i third_party/ffmpeg/chromium/scripts/generate_gn.py
 
 ./build/linux/unbundle/replace_gn_files.py --system-libraries \
 %if %{with system_ffmpeg}
