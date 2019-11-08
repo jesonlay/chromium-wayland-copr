@@ -306,7 +306,6 @@ gn_args=(
     use_gnome_keyring=false
     use_gio=false
     use_dbus=true
-    use_jumbo_build=true
     use_kerberos=true
     use_libpci=true
     use_pulseaudio=false
