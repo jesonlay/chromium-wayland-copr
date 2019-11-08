@@ -375,7 +375,7 @@ git clone https://gn.googlesource.com/gn
 rm -drf gn/.git
 cp -drf gn/* tools/gn/
 
-sed -i '/-static-libstdc++/d' tools/gn/build/gen.py
+#sed -i '/-static-libstdc++/d' tools/gn/build/gen.py
 ./tools/gn/bootstrap/bootstrap.py --skip-generate-buildfiles --gn-gen-args "${gn_args[*]}"
 ./out/Release/gn gen out/Release \
     --script-executable=/usr/bin/python2 --args="${gn_args[*]}"
