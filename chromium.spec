@@ -265,7 +265,8 @@ sed -i '1s|python$|&2|' \
 # sed -i 's|SCANOUT_VDA_WRITE|SCANOUT_CPU_READ_WRITE|g' media/gpu/vaapi/vaapi_picture_native_pixmap_ozone.cc
 # Don't use static libstdc++
 sed -i '7  s/^/#include <memory>\n/' net/dns/address_info.h
-sed -i '7  s/^/#include <memory>\n/' /ui/events/ozone/evdev/touch_filter/neural_stylus_palm_detection_filter.h  
+sed -i '7  s/^/#include <memory>\n/' ui/events/ozone/evdev/touch_filter/neural_stylus_palm_detection_filter.h  
+sed -i '7  s/^/#include <memory>\n/' ui/base/cursor/ozone/bitmap_cursor_factory_ozone.cc
 rm -rf third_party/markupsafe
 ln -s %{python2_sitearch}/markupsafe third_party/markupsafe
 
