@@ -303,6 +303,7 @@ gn_args=(
     is_debug=false
     is_component_build=false
     use_sysroot=false
+    use_jumbo_build=true
     use_custom_libcxx=false
     use_aura=true
     use_cups=true
